@@ -1,24 +1,29 @@
+%http://it.mathworks.com/matlabcentral/fileexchange/1176-quaternion-toolbox
 mysetup('quaternions');
 % build input and output manifolds
-mx = manisetup(makeQuat()); 
+mx = manisetup(makeCom(makeQuat(),makeRn(3))); % quat and vel 
 mz = manisetup(makeQuat());
 
 % initial state and noise definition
-x0 = mx.step([1,0,0,0],[pi/2,0.2,0]);
+x0 = mx.step([0,0,0,1, 0,0,0],[pi/2,0.2,0, 0,0,0]);
 P0 = 0.5*eye(mx.alg);
-Q = 0.001*eye(mx.alg); % process noise
-R = eye(mz.alg); % measure noise
-zobs = [1,0,0,0]; 
+Q = 0.01*eye(mx.alg); % process noise
+R = 1e-8*eye(mz.alg); % measure noise
+zobs = qomega2q([pi/2,0,0]);
 
-wsigmax = ut_mweights2(mx.alg,0.5);
-wsigmaz = ut_mweights2(mz.alg,0.5);
+wsigmax = ut_mweights2(mx.group,mx.alg,0.5);
 
-% functions
-h_fx = @(x) x; 
-f_fx = @(x) x;
+% observation is identity
+% process is the integral
+dt = 0.1;
+
+% Process is the integral of the omega by time
+% Note: in the paper Kraft: they state qk q_noise q_vel
+f_fx = @(qk,ok) deal(qmult(qk,qomega2q(dt*ok)),ok);
+h_fx = @(qk,ok) qk;
 
 % loop
-while 1==1
+for L=1:100
     
     % process: if not identity
     if isempty(f_fx) == 0
@@ -42,7 +47,7 @@ while 1==1
         for I=1:size(cXs,1)
             [cZs{I,:}] = h_fx(cXs{I,:});
         end
-        [zm,Czz,Cxz] = maniunsigma(mz,manipack(mz,cZs),wsigmaz,vXs); % [Gz,Gx]
+        [zm,Czz,Cxz] = maniunsigma(mz,manipack(mz,cZs),wsigmax,vXs); % [Gz,Gx]
     else
         % identity function
         zm = xp;
@@ -53,6 +58,8 @@ while 1==1
     % Kalman update with observation noise (additive)    
     Pvv = Czz + R;
     K = Cxz/Pvv;
-    x0 = mx.step(xp,K*mz.delta(zm,zobs));
+    delta = mz.delta(zobs,zm);
+    x0 = mx.step(xp,(K*delta')');
+    delta
     
 end

@@ -38,7 +38,7 @@ else
             % same as: se3_logdelta but with igk once
             v(i,:) = model.delta(Chiz(i,:),mz);
         end
-        mz = model.step(mz,v'*sigmainfo.WM); % [A,S] [S,1]
+        mz = model.step(mz,(v'*sigmainfo.WM)'); % [A,S] [S,1]
     end
     
     % update v for computing covariance

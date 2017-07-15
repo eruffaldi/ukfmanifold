@@ -97,3 +97,5 @@ References for Beyond this:
 - Hauberg, Søren. "Principal curves on Riemannian manifolds." IEEE transactions on pattern analysis and machine intelligence 38.9 (2016): 1915-1921.
 - Srivatsan, Rangaprasad Arun, et al. "Estimating SE (3) elements using a dual quaternion based linear Kalman filter." Robotics: Science and Systems. 2016.
 
+Geometric integration of quat:
+- https://www.researchgate.net/profile/John_Crassidis/publication/260466470_Geometric_Integration_of_Quaternions/links/557acc0a08ae8d0481931b51/Geometric-Integration-of-Quaternions.pdf

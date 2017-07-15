@@ -9,6 +9,7 @@ m.log = @(x) x;
 m.exp = @(x) x;
 m.meancov = @meancov;
 m.delta = @(x,y) x-y;
+m.step = @(x,y) x+y;
 m.group = n;
 m.alg = n;
 m.count = 1;

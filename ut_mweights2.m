@@ -1,19 +1,19 @@
-%   n     - Dimensionality of random variable
-%   k     - 
+%   n     - Dimensionality of the group (if needed9
+%   k     - Dimensionality of the tangent space
 %   alpha - Transformation parameter  (optional, default 0.5)
 %   beta  - Transformation parameter  (optional, default 2)
 %   kappa - Transformation parameter  (optional, default 3-n)
 % Copyright (C) 2006 Simo Sarkka
 %
 % Modified Emanele Ruffaldi 2014
-function [wei] = ut_weights2(k,alpha,beta,kappa)
-if nargin < 2
+function [wei] = ut_weights2(n,k,alpha,beta,kappa)
+if nargin < 3
     alpha = 0.5;
 end
-if nargin < 3
+if nargin < 4
     beta = 2;
 end
-if nargin < 4
+if nargin < 5
     kappa = 3-k;
 end
 
