@@ -1,15 +1,15 @@
 %http://it.mathworks.com/matlabcentral/fileexchange/1176-quaternion-toolbox
 mysetup('quaternions');
 % build input and output manifolds
-mx = manisetup(makeCom(makeQuat(),makeRn(3))); % quat and vel 
-mz = manisetup(makeQuat());
+mx = manisetup(makeCom(makeRot(),makeRn(3))); % quat and vel 
+mz = manisetup(makeRot());
 
 % initial state and noise definition
-x0 = mx.step([0,0,0,1, 0,0,0],[pi/2,0.2,0, 0,0,0]);
+x0 = mx.step(mx.pack(eye(3)),[pi/2,0.2,0, 0,0,0]);
 P0 = 0.5*eye(mx.alg);
 Q = 0.01*eye(mx.alg); % process noise
 R = 1e-3*eye(mz.alg); % measure noise
-zobs = qomega2q([pi/2,0,0]);
+zobs = mx.exp([pi/2,0,0]);
 
 wsigmax = ut_mweights2(mx.group,mx.alg,0.5);
 
@@ -17,9 +17,8 @@ wsigmax = ut_mweights2(mx.group,mx.alg,0.5);
 % process is the integral
 dt = 0.1;
 
-% Process is the integral of the omega by time
-% Note: in the paper Kraft: they state qk q_noise q_vel
-f_fx = @(qk,ok) deal(qmult(qk,qomega2q(dt*ok)),ok);
+% integrate 
+f_fx = @(qk,ok) deal(dt*skew(ok)*qk,ok);
 h_fx = @(qk,ok) qk;
 
 % loop
