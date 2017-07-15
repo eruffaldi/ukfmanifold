@@ -74,9 +74,9 @@ Case of quaternion
 
 The reference paper on UKF and Quaternion is not using the algebra but directly quaternions
 
-Paper: http://kodlab.seas.upenn.edu/uploads/Arun/UKFpaper.pdf (http://ieeexplore.ieee.org/document/1257247/)
-Our Paper: https://dl.dropboxusercontent.com/u/146279/papers/2017_C_ETFADiStefano.pdf
-Bonus for large dimensions: http://www.cs.unc.edu/~welch/kalman/media/pdf/ACC02-IEEE1357.PDF
-Averaging: http://www.acsu.buffalo.edu/~johnc/uf_att.pdf
-Italian: https://re.public.polimi.it/retrieve/handle/11311/961634/40508/1_Manuscript.pdf
+* Paper: http://kodlab.seas.upenn.edu/uploads/Arun/UKFpaper.pdf (http://ieeexplore.ieee.org/document/1257247/)
+* Our Paper: https://dl.dropboxusercontent.com/u/146279/papers/2017_C_ETFADiStefano.pdf
+* Bonus for large dimensions: http://www.cs.unc.edu/~welch/kalman/media/pdf/ACC02-IEEE1357.PDF
+* Averaging: http://www.acsu.buffalo.edu/~johnc/uf_att.pdf
+* Italian: https://re.public.polimi.it/retrieve/handle/11311/961634/40508/1_Manuscript.pdf
 
