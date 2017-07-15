@@ -69,14 +69,31 @@ Case of quaternion
 - step: integral
 - logarithm/exponential: rodriguez and its inverse
 
+# TODO and Ideas
+- test
+- make example of two quat
+- dual quaternion manifold vs SE3 matrix
 
 # References
 
-The reference paper on UKF and Quaternion is not using the algebra but directly quaternions
+Riemman Manifold UKF: http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.646.893&rep=rep1&type=pdf
+Hauberg, Søren, François Lauze, and Kim Steenstrup Pedersen. "Unscented Kalman filtering on Riemannian manifolds." Journal of mathematical imaging and vision 46.1 (2013): 103-120.
 
+Quaternion UKF:
 * Paper: http://kodlab.seas.upenn.edu/uploads/Arun/UKFpaper.pdf (http://ieeexplore.ieee.org/document/1257247/)
 * Our Paper: https://dl.dropboxusercontent.com/u/146279/papers/2017_C_ETFADiStefano.pdf
+
+Note for Scaled UKF
 * Bonus for large dimensions: http://www.cs.unc.edu/~welch/kalman/media/pdf/ACC02-IEEE1357.PDF
+
+Note for Averaging
 * Averaging: http://www.acsu.buffalo.edu/~johnc/uf_att.pdf
 * Italian: https://re.public.polimi.it/retrieve/handle/11311/961634/40508/1_Manuscript.pdf
+
+References for Beyond this:
+- Bourmaud, Guillaume, et al. "Continuous-discrete extended Kalman filter on matrix Lie groups using concentrated Gaussian distributions." Journal of Mathematical Imaging and Vision 51.1 (2015): 209-228.
+- Windle, Jesse, and Carlos M. Carvalho. "A tractable state-space model for symmetric positive-definite matrices." Bayesian Analysis 9.4 (2014): 759-792.
+- Freifeld, Oren, Soren Hauberg, and Michael J. Black. "Model transport: Towards scalable transfer learning on manifolds." Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition. 2014.
+- Hauberg, Søren. "Principal curves on Riemannian manifolds." IEEE transactions on pattern analysis and machine intelligence 38.9 (2016): 1915-1921.
+- Srivatsan, Rangaprasad Arun, et al. "Estimating SE (3) elements using a dual quaternion based linear Kalman filter." Robotics: Science and Systems. 2016.
 
