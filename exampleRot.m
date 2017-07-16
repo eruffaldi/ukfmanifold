@@ -5,11 +5,11 @@ mx = manisetup(makeCom(makeRot(),makeRn(3))); % quat and vel
 mz = manisetup(makeRot());
 
 % initial state and noise definition
-x0 = mx.step(mx.pack(eye(3)),[pi/2,0.2,0, 0,0,0]);
+x0 = mx.step(mx.pack({eye(3),[0,0,0]}),[pi/2,0.2,0, 0,0,0]);
 P0 = 0.5*eye(mx.alg);
 Q = 0.01*eye(mx.alg); % process noise
 R = 1e-3*eye(mz.alg); % measure noise
-zobs = mx.exp([pi/2,0,0]);
+zobs = mz.exp([pi/2,0,0]);
 
 wsigmax = ut_mweights2(mx.group,mx.alg,0.5);
 
@@ -18,7 +18,7 @@ wsigmax = ut_mweights2(mx.group,mx.alg,0.5);
 dt = 0.1;
 
 % integrate 
-f_fx = @(qk,ok) deal(dt*skew(ok)*qk,ok);
+f_fx = @(qk,ok) deal(so3exp(dt*ok)*qk,ok);
 h_fx = @(qk,ok) qk;
 
 % loop
@@ -33,6 +33,7 @@ for L=1:size(deltas,1)
     % Kalman update with observation noise (additive)    
     Pvv = Czz + R;
     K = Cxz/Pvv;
+    P0 = (eye(size(P0)) - K * Pvv * K') * P0;
     delta = mz.delta(zobs,zm);
     x0 = mx.step(xp,(K*delta')');
     deltas(L,:) = delta;

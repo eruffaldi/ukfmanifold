@@ -18,8 +18,8 @@ m.group = m1.group+m2.group;
 m.alg = m1.alg+m2.alg;
 m.count = m1.count+m2.count;
 m.models = {m1,m2};
-m.pack = []; %@(x) [m1.flatten(x{1}), m2.flatten(x{2})]; % this works with cells
-m.unpack = []; %@(x) {m1.unflatten(x(1:g)), m1.unflatten(x(g+1:end))};
+m.pack = @(x) [m1.pack(x{1}), m2.pack(x{2})]; % this works with cells
+m.unpack = @(x) {m1.unpack(x(1:g)), m2.unpack(x(g+1:end))};
 
 m.meancov = @meancovRn;
 
