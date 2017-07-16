@@ -14,7 +14,8 @@
 function [Chi,vChi] = manisigmas(model,mu,S,sigmainfo)
 
 % decompose the covariance
-C = cholcov(S); % TODO use svd
+%C = cholcov(S); % TODO use svd
+C = sigmainfo.sqrt(S);
 if size(C,1) ~= size(S,1)
     C = eye(size(S,1));
 end

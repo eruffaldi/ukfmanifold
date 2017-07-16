@@ -44,3 +44,4 @@ wei = [];
 wei.c = sqrt(c);
 wei.WM = WM;
 wei.W = W;
+wei.sqrt = @cholcov;

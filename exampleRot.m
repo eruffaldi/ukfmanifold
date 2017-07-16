@@ -13,6 +13,7 @@ R = 1e-3*eye(mz.alg); % measure noise
 zobs = mz.exp([pi/2,0,0]);
 
 wsigmax = ut_mweights2(mx.group,mx.alg,0.5);
+wsigmax.sqrt = @svdsqrt; 
 
 % observation is identity
 % process is the integral
@@ -22,6 +23,7 @@ dt = 0.1;
 f_fx = @(qk,ok) deal(so3exp(dt*ok)*qk,ok);
 h_fx = @(qk,ok) qk;
 
+tic
 % loop
 deltas = zeros(200,mz.alg);
 states = zeros(size(deltas,1),mx.group);
@@ -39,6 +41,7 @@ for L=1:size(deltas,1)
     x0 = mx.step(xp,(K*delta')');
     deltas(L,:) = delta;
 end
+toc
 figure(1)
 plot(deltas(10:end,:))
 figure(2)
