@@ -1,3 +1,4 @@
+% Emanuele Ruffaldi 2017 @ SSSA
 function [xp,Pp] = manistatestep(mx,x0,P0,f_fx,Q,wsigmax)
 
     % process: if not identity

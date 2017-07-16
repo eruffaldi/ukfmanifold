@@ -1,4 +1,5 @@
 % reverse of qdecomp
+% Emanuele Ruffaldi 2017 @ SSSA
 function q = qomega2q(omega)
 
 momega = norm(omega);

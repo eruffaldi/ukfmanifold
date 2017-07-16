@@ -1,4 +1,5 @@
 % takes a model m and cell array and builds a paclged group
+% Emanuele Ruffaldi 2017 @ SSSA
 function y = manipack(m,c)
 
 assert(isfield(m,'s'),'missing setup, use manisetup(m)');

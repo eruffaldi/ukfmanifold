@@ -2,6 +2,8 @@
 %
 % pack/unpack group (cell NxC) <-> (matrix NxG)
 % pack/unpack alg   (cell NxC) <-> (matrix NxA)
+%
+% Emanuele Ruffaldi 2017 @ SSSA
 function m = manisetup(m)
 
 s = dosetup(1,1,m);

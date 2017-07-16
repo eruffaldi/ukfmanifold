@@ -5,6 +5,8 @@
 %  sigma: Chiz
 %  sigmainfo: the weights
 %  the delta of input sigma: vChi (see manisigma)
+%
+% Emanuele Ruffaldi 2017 @ SSSA
 function [mz,Czz,Cxz] = maniunsigma(model,Chiz,sigmainfo,vChi)
 
 % estimates the mean in a weighted way

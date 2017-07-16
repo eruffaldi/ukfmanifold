@@ -1,3 +1,6 @@
+% Evaluation of a function
+%
+% Emanuele Ruffaldi 2017 @ SSSA
 function [zm,Czz,Cxz] = manievalh(mx,mz,xp,Pp,h_fx,wsigmax)
     
     if isempty(h_fx) == 0

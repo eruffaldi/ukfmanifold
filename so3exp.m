@@ -1,3 +1,4 @@
+% Emanuele Ruffaldi 2017 @ SSSA
 function R = so3exp(omega)
 
 theta = norm(omega);

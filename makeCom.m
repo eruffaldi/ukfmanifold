@@ -1,4 +1,6 @@
-% combination
+% combination of models
+%
+% Emanuele Ruffaldi 2017 @ SSSA
 function m = makeCom(varargin)
 
 if nargin == 1

@@ -1,5 +1,6 @@
 % takes a model(C,G,A) m and a packed group x (matrix NxG) and builds a cell array
 % (NxC)
+% Emanuele Ruffaldi 2017 @ SSSA
 function c = maniunpack(m,x)
 
 

@@ -1,4 +1,6 @@
 % SO3 as quaternion with (xyz w)
+%
+% Emanuele Ruffaldi 2017 @ SSSA
 function m = makeQuat()
 
 

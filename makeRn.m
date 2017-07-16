@@ -1,4 +1,6 @@
 % euclidean
+%
+% Emanuele Ruffaldi 2017 @ SSSA
 function m = makeRn(n)
 
 

@@ -1,4 +1,6 @@
 % SO3 as matrix
+%
+% Emanuele Ruffaldi 2017 @ SSSA
 function m = makeRot()
 
 

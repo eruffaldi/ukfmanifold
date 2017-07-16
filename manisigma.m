@@ -9,6 +9,8 @@
 % Outputs:
 %  sigmapoints Chi
 %  deltsa vChi
+%
+% Emanuele Ruffaldi 2017 @ SSSA
 function [Chi,vChi] = manisigmas(model,mu,S,sigmainfo)
 
 % decompose the covariance

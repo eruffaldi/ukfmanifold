@@ -1,3 +1,6 @@
+% SE3 to be tested, alternatively use makeCom(makeRot(),makeRn(3))
+%
+% Emanuele Ruffaldi 2017 @ SSSA
 function m = makeSE3()
 
 m1 = makeRot();
