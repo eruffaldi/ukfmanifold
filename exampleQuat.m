@@ -1,3 +1,6 @@
+% TODO: explain better the fact that angular velocity of the state is
+% GLOBAL rather than LOCAL
+%
 %http://it.mathworks.com/matlabcentral/fileexchange/1176-quaternion-toolbox
 mysetup('quaternions');
 % build input and output manifolds
@@ -19,7 +22,7 @@ dt = 0.1;
 
 % Process is the integral of the omega by time
 % Note: in the paper Kraft: they state qk q_noise q_vel
-f_fx = @(qk,ok) deal(qmult(qk,qomega2q(dt*ok)),ok);
+f_fx = @(qk,ok) deal(qmult(qomega2q(dt*ok),qk),ok);
 h_fx = @(qk,ok) qk;
 
 % loop

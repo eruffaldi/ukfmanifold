@@ -1,7 +1,8 @@
-%http://it.mathworks.com/matlabcentral/fileexchange/1176-quaternion-toolbox
-mysetup('quaternions');
+% TODO: explain better the fact that angular velocity of the state is
+% GLOBAL rather than LOCAL
+
 % build input and output manifolds
-mx = manisetup(makeCom(makeRot(),makeRn(3))); % quat and vel 
+mx = manisetup(makeCom(makeRot(),makeRn(3))); 
 mz = manisetup(makeRot());
 
 % initial state and noise definition
