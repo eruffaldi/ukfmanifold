@@ -33,4 +33,4 @@ for I=1:k
 	Chi(I+1,:) = model.step(mu,psi);
 	Chi(I+1+k,:) = model.step(mu,-psi);
 end
-a=1;
+
