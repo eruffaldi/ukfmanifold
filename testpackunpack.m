@@ -1,7 +1,16 @@
+%%
+mo = manisetup(makeProduct(makeSE3Mat()));
+
+zi = zeros(2,mo.group);
+zi(:) = 1:numel(zi);
+zu = maniunpack(mo,zi);
+zp = manipack(mo,zu);
+size(zu)
+size(zp)
 
 
-
-mo = manisetup(makeCom(makeRot(),makeRot()));
+%%
+mo = manisetup(makeproduct(makeRot(),makeRot()));
 
 zi = zeros(2,mo.group);
 zi(:) = 1:numel(zi);

@@ -8,6 +8,17 @@ qs = m.step(q0,w1);
 w2 = m.delta(qs,q0)
 w1-w2
 
+
+%%
+m = makeSE3Mat();
+
+x0 = m.exp([0.5,0.2,0,  0.1,0,1]); % 4x4
+
+w1 = [0.2,0,0, 0.0,0.1,0,2];
+x1 = m.step(x0,w1);
+w2 = m.delta(x1,x0)
+w1-w2
+
 %%
 mr = makeRot();
 

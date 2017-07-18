@@ -2,16 +2,16 @@
 % GLOBAL rather than LOCAL
 
 % build input and output manifolds
-mx = manisetup(makeCom(makeRot(),makeRn(3))); 
-mxr = makeRot(); % helper for the integration
-mz = manisetup(makeRot());
+mx = manisetup(makeProduct(makeSE3Mat(),makeRn(3),makeRn(3))); 
+mxt = makeSE3Mat(); % helper
+mz = manisetup(makeSE3Mat());
 
 % initial state and noise definition
-x0 = mx.step(mx.pack({eye(3),[0,0,0]}),[pi/2,0.2,0, 0,0,0]);
+x0 = mx.step(mx.exp([0,0,0,  0,1,0,   0,0,0,   0,0,0]),[pi/2,0.2,0,  0,0,0,   0,0,0,   0,0,0]);
 P0 = 0.5*eye(mx.alg);
 Q = 0.01*eye(mx.alg); % process noise
 R = 1e-3*eye(mz.alg); % measure noise
-zobs = mz.exp([pi/2,0,0]);
+zobs = mz.exp([pi/2,0,0, 0,0,1]);
 
 wsigmax = ut_mweights2(mx.group,mx.alg,0.5);
 wsigmax.sqrt = @svdsqrt; 
@@ -21,8 +21,8 @@ wsigmax.sqrt = @svdsqrt;
 dt = 0.1;
 
 % integrate 
-f_fx = @(qk,ok) deal(mxr.step(qk,dt*ok),ok);
-h_fx = @(qk,ok) qk;
+f_fx = @(Tk,wk,vk) deal(mxt.step(Tk,[wk,vk]),wk,vk);
+h_fx = @(Tk,wk,vk) Tk;
 
 tic
 % loop
