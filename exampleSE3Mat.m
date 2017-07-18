@@ -7,9 +7,10 @@ mxt = makeSE3Mat(); % helper
 mz = manisetup(makeSE3Mat());
 
 % initial state and noise definition
-x0 = mx.step(mx.exp([0,0,0,  0,1,0,   0,0,0,   0,0,0]),[pi/2,0.2,0,  0,0,0,   0,0,0,   0,0,0]);
+x0 = mx.step(mx.exp([0,0,0,  0,
+    1,0,   0,0,0,   0,0,0]),[pi/2,0.2,0,  0,0,0,   0,0,0,   0,0,0]);
 P0 = 0.5*eye(mx.alg);
-Q = 0.01*eye(mx.alg); % process noise
+Q = 0.01*eye(mx.alg); % process noi!se
 R = 1e-3*eye(mz.alg); % measure noise
 zobs = mz.exp([pi/2,0,0, 0,0,1]);
 
