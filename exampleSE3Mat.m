@@ -12,7 +12,22 @@ x0 = mx.step(mx.exp([0,0,0,  0,1,0,   0,0,0,   0,0,0]),[pi/2,0.2,0,  0,0,0,   0,
 P0 = 0.5*eye(mx.alg);
 Q = 0.01*eye(mx.alg); % process noi!se
 R = 1e-3*eye(mz.alg); % measure noise
-zobs = @(x) mz.exp([pi/2,0,0, 0,sin(x/10),1]);
+
+z0 = mz.exp([pi/2,0,0, 0,0.1,1]);
+zobsval = zeros(200,16);
+
+% costant se3 velocity
+o0 = zeros(6,1);
+o0(4) = 0.1;
+o0(1) = 0.2;
+zobsval(1,:) = z0;
+lzobsval = zeros(size(zobsval,1),mz.alg);
+lzobsval(1,:) = mz.log(z0);
+for I=2:size(zobsval,1)
+    zobsval(I,:) = mz.step(zobsval(I-1,:),o0);
+    lzobsval(I,:) = mz.log(zobsval(I,:));
+end
+zobs = @(t) zobsval(t,:);
 
 wsigmax = ut_mweights2(mx.group,mx.alg,0.5);
 wsigmax.sqrt = @svdsqrt; 
@@ -48,8 +63,23 @@ end
 %%
 toc
 figure(1)
-plot(deltas(10:end,4:6))
+subplot(3,1,1);
+plot(deltas(:,1:3))
 title('Deltas observation-prediction');
+xlabel('sample');
+subplot(3,1,2);
+plot(deltas(:,4:6))
+title('Deltas observation-prediction');
+xlabel('sample');
+subplot(3,1,3);
+plot(sum(deltas.^2,2));
+title('Norm of error');
+xlabel('sample');
 figure(2)
 plot(states(10:end,:))
 title('All states as matrix');
+
+for J=1:6
+    figure(2+J);
+    plot([lstates(:,J),lzobsval(:,J)]);
+end
