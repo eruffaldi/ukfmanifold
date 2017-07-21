@@ -79,7 +79,13 @@ figure(2)
 plot(states(10:end,:))
 title('All states as matrix');
 
+%% Latency estimation
+dd = zeros(6,1);
 for J=1:6
     figure(2+J);
+    dd(J) = finddelay(lstates(:,J),lzobsval(:,J));
+
     plot([lstates(:,J),lzobsval(:,J)]);
 end
+disp('delay')
+dd
