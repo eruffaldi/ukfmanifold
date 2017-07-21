@@ -10,7 +10,7 @@ m.prod = @(x,y) mflat(munflat(x)*munflat(y));
 m.m1 = makeRot();
 m.log = @se3log;
 m.exp = @se3exp;
-m.delta = @(x,y) se3delta(m1,x,y);
+m.delta = @(x,y) se3log(munflat(x)*munflat(se3inv(y)));
 m.pack = @mflat;
 m.unpack = @munflat;
 
@@ -49,7 +49,6 @@ R = getrot(x);
         Q= 1/(theta^2)*(1 - A/2/B);
         iV = eye(3) - 1/2*SO + Q*SO^2; % use directly skew of omega
     end
-
     omega = [SO(3,2) SO(1,3) SO(2,1)];
 
 %y = [m1.log(getrot(x)), getpos(x)]; % not exact
@@ -89,13 +88,14 @@ if theta < 1e-12
     
 else
     %Original
-    %A = sin(theta)/theta;
-    %B = (1-cos(theta))/(theta^2);
-    %C = (theta-sin(theta))/(theta^3);
-    %S = skew(omega);
-    %R = eye(3) + A*S + B*S^2;
-    %V = eye(3) + B*S + C*S^2;
-    
+    if 1==1
+        A = sin(theta)/theta;
+        B = (1-cos(theta))/(theta^2);
+        C = (theta-sin(theta))/(theta^3);
+        S = skew(omega);
+        R = eye(3) + A*S + B*S^2;
+        V = eye(3) + B*S + C*S^2;
+    else
     %Barfoot
         
         axis = omega/theta;
@@ -107,7 +107,7 @@ else
         
         R = cp*eye(3) + (1-cp)*axis*(axis') + sp*sa;
         V = sph * eye(3) + (1 - sph) * axis * (axis') + cph * sa;
-       
+    end
     
 end
 
@@ -116,9 +116,7 @@ y(1:3,1:3) = R;
 y(1:3,4) = V*u(:);
 y = mflat(y);
 
-function r = se3delta(m1,x,y)
 
-r =  [m1.delta(getrot(x),getrot(y)), getpos(x)-getpos(y)];
 
 function u = mflat(x)
 

@@ -3,16 +3,16 @@
 
 % build input and output manifolds
 mx = manisetup(makeProduct(makeSE3Mat(),makeRn(3),makeRn(3))); 
-mxt = makeSE3Mat(); % helper
 mz = manisetup(makeSE3Mat());
 
+mxt = makeSE3Mat(); % helper without the need of setup
+
 % initial state and noise definition
-x0 = mx.step(mx.exp([0,0,0,  0,
-    1,0,   0,0,0,   0,0,0]),[pi/2,0.2,0,  0,0,0,   0,0,0,   0,0,0]);
+x0 = mx.step(mx.exp([0,0,0,  0,1,0,   0,0,0,   0,0,0]),[pi/2,0.2,0,  0,0,0,   0,0,0,   0,0,0]);
 P0 = 0.5*eye(mx.alg);
 Q = 0.01*eye(mx.alg); % process noi!se
 R = 1e-3*eye(mz.alg); % measure noise
-zobs = mz.exp([pi/2,0,0, 0,0,1]);
+zobs = @(x) mz.exp([pi/2,0,0, 0,sin(x/10),1]);
 
 wsigmax = ut_mweights2(mx.group,mx.alg,0.5);
 wsigmax.sqrt = @svdsqrt; 
@@ -21,16 +21,18 @@ wsigmax.sqrt = @svdsqrt;
 % process is the integral
 dt = 0.1;
 
-% integrate 
-f_fx = @(Tk,wk,vk) deal(mxt.step(Tk,[wk,vk]),wk,vk);
+
+f_fx = @(Tk,wk,vk) deal(mxt.step(Tk,[wk,vk]),wk,vk); % Xk = (Tk,wk,vk)
 h_fx = @(Tk,wk,vk) Tk;
 
 tic
 % loop
 deltas = zeros(200,mz.alg);
 states = zeros(size(deltas,1),mx.group);
+lstates = zeros(size(deltas,1),mx.alg);
 for L=1:size(deltas,1)
     states(L,:) = x0;
+    lstates(L,:) = mx.log(x0);
     
     [xp,Pp] = manistatestep(mx,x0,P0,f_fx,Q,wsigmax);
     [zm,Czz,Cxz] = manievalh(mx,mz,xp,Pp,h_fx,wsigmax);
@@ -39,12 +41,15 @@ for L=1:size(deltas,1)
     Pvv = Czz + R;
     K = Cxz/Pvv;
     P0 = (eye(size(P0)) - K * Pvv * K') * P0;
-    delta = mz.delta(zobs,zm);
+    delta = mz.delta(zobs(L),zm);
     x0 = mx.step(xp,(K*delta')');
     deltas(L,:) = delta;
 end
+%%
 toc
 figure(1)
-plot(deltas(10:end,:))
+plot(deltas(10:end,4:6))
+title('Deltas observation-prediction');
 figure(2)
 plot(states(10:end,:))
+title('All states as matrix');

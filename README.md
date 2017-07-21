@@ -11,12 +11,15 @@ In particular we acknowledge that
 * we express a multivariate Gaussian as N(mu, Sigma) as usual
 
 For general:
-* prod(Group,Group) -> Group
 * delta(Group,Group) -> tangent
 * step(Group,tangent) -> Group
 
+
+* prod(Group,Group) -> Group
+
 For Lie Group they are:
 * prod(X,Y) = X * Y
+* inv(X) se SO3 = R',, se SE3' [R' | -R't]
 * delta(X, Y) = log(X * inv(Y))
 * step(X, y) = exp(y) * X
 
@@ -76,7 +79,7 @@ Case of quaternion
 
 # References
 
-Riemman Manifold UKF: http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.646.893&rep=rep1&type=pdf
+Riemman Manifold UKF 2013: http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.646.893&rep=rep1&type=pdf
 Hauberg, Søren, François Lauze, and Kim Steenstrup Pedersen. "Unscented Kalman filtering on Riemannian manifolds." Journal of mathematical imaging and vision 46.1 (2013): 103-120.
 
 Quaternion UKF:

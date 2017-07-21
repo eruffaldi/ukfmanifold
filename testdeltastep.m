@@ -14,9 +14,23 @@ m = makeSE3Mat();
 
 x0 = m.exp([0.5,0.2,0,  0.1,0,1]); % 4x4
 iix0 = m.inv(m.inv(x0));
+lx0 = m.log(x0)
 
-w1 = [0.2,0,0, 0.0,0.1,2];
+w1 = [0.2,0,0, 0.0,0.0,0];
 x1 = m.step(x0,w1);
+disp('With Rotation');
+w2 = m.delta(x1,x0)
+w1-w2
+
+w1 = [0.0,0,0, 0.0,0.0,2];
+x1 = m.step(x0,w1);
+disp('With Velocity');
+w2 = m.delta(x1,x0)
+w1-w2
+
+w1 = [0.0,0.2,0.2, 0.0,0.0,2];
+x1 = m.step(x0,w1);
+disp('Both');
 w2 = m.delta(x1,x0)
 w1-w2
 
