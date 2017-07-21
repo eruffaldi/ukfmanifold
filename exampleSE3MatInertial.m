@@ -1,9 +1,7 @@
-% TODO: explain better the fact that angular velocity of the state is
-% GLOBAL rather than LOCAL
 
-% build input and output manifolds
+
 mx = manisetup(makeProduct(makeSE3Mat(),makeRn(3),makeRn(3))); 
-mz = manisetup(makeSE3Mat());
+mz = manisetup(makeRn(3),makeRn(3));
 
 mxt = makeSE3Mat(); % helper without the need of setup
 
@@ -13,10 +11,9 @@ P0 = 0.5*eye(mx.alg);
 Q = 0.01*eye(mx.alg); % process noi!se
 R = 1e-3*eye(mz.alg); % measure noise
 
+% BUILD OBSERVATION
 z0 = mz.exp([pi/2,0,0, 0,0.1,1]);
 zobsval = zeros(200,16);
-
-% costant se3 velocity
 v0 = zeros(6,1);
 v0(4) = 0.1;
 v0(1) = 0.2;
@@ -30,16 +27,18 @@ for I=2:size(zobsval,1)
 end
 zobs = @(t) zobsval(t,:);
 
+
+
+
 wsigmax = ut_mweights2(mx.group,mx.alg,0.5);
 wsigmax.sqrt = @svdsqrt; 
 
-% observation is identity
-% process is the integral
 dt = 0.1;
 
-
+% dot omega = - inv(I) ( omega cross I omega)
+% I that is local
 f_fx = @(Tk,wk,vk) deal(mxt.step(Tk,[wk,vk]),wk,vk); % Xk = (Tk,wk,vk)
-h_fx = []; %@(Tk,wk,vk) Tk;
+h_fx = []; % @(Tk,wk,vk) deal(wk,vk);
 
 tic
 % loop
