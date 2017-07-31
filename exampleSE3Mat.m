@@ -4,6 +4,7 @@
 % build input and output manifolds
 mx = manisetup(makeProduct(makeSE3Mat(),makeRn(3),makeRn(3))); 
 mz = manisetup(makeSE3Mat());
+mzr = manisetup(makeRot()); % only rotation, loss of position
 
 mxt = makeSE3Mat(); % helper without the need of setup
 
@@ -12,6 +13,7 @@ x0 = mx.step(mx.exp([0,0,0,  0,1,0,   0,0,0,   0,0,0]),[pi/2,0.2,0,  0,0,0,   0,
 P0 = 0.5*eye(mx.alg);
 Q = 0.01*eye(mx.alg); % process noi!se
 R = 1e-3*eye(mz.alg); % measure noise
+Rr = R(1:3,1:3); % only rotations
 
 z0 = mz.exp([pi/2,0,0, 0,0.1,1]);
 zobsval = zeros(200,16);
@@ -37,28 +39,65 @@ wsigmax.sqrt = @svdsqrt;
 % process is the integral
 dt = 0.1;
 
-
+% functions work in the real group space
 f_fx = @(Tk,wk,vk) deal(mxt.step(Tk,[wk,vk]),wk,vk); % Xk = (Tk,wk,vk)
-h_fx = []; %@(Tk,wk,vk) Tk;
-
+h_fx = @(Tk,wk,vk) Tk;
+hr_fx = @(Tk,wk,vk) Tk(1:3,1:3);
 tic
 % loop
 deltas = zeros(200,mz.alg);
 states = zeros(size(deltas,1),mx.group);
 lstates = zeros(size(deltas,1),mx.alg);
+haspos = ones(200,1);
+haspos(4:4:end) = 0;
+haspos(5:4:end) = 0;
+haspos(6:4:end) = 0;
+usereduxspace = 0;
+
 for L=1:size(deltas,1)
     states(L,:) = x0;
     lstates(L,:) = mx.log(x0);
     
     [xp,Pp] = manistatestep(mx,x0,P0,f_fx,Q,wsigmax);
-    [zm,Czz,Cxz] = manievalh(mx,mz,xp,Pp,h_fx,wsigmax);
     
-    % Kalman update with observation noise (additive)    
-    Pvv = Czz + R;
-    K = Cxz/Pvv;
-    P0 = (eye(size(P0)) - K * Pvv * K') * P0;
-    delta = mz.delta(zobs(L),zm);
-    x0 = mx.step(xp,(K*delta')');
+    if haspos(L) == 0 && usereduxspace        
+        [zm,Czz,Cxz] = manievalh(mx,mzr,xp,Pp,hr_fx,wsigmax);
+
+        % Kalman update with observation noise (additive)    
+        Pvv = Czz + Rr;
+        K = Cxz/Pvv;
+        P0 = (eye(size(P0)) - K * Pvv * K') * P0;
+        
+        fullobs_mat = mz.unpack( zobs(L)); % from SE3 16x1 to SE3 4x4
+        
+        deltar = mzr.delta(mzr.pack(fullobs_mat(1:3,1:3)),zm);
+        x0 = mx.step(xp,(K*deltar')');
+        delta = [deltar, NaN,NaN,NaN]; % ONLY for viz
+    else       
+        [zm,Czz,Cxz] = manievalh(mx,mz,xp,Pp,h_fx,wsigmax);
+
+        % Kalman update with observation noise (additive)    
+        if haspos(L) == 0
+            % maximal noise except for the rotation part
+            Rr = 1e10*ones(size(R));
+            Rr(1:3,1:3) = R(1:3,1:3);
+            Rr(1:3,4:6) = 0;
+            Czz(1:3,4:6) = 0;
+            Czz(4:6,1:3) = 0;
+            Pvv = Czz + Rr;
+            % zero out the observation (cannot use NaN)
+            z = mz.unpack(zobs(L));
+            z(1:3,4) = 0;
+            z = mz.pack(z);            
+        else
+            Pvv = Czz + R;
+            z = zobs(L);
+        end
+        K = Cxz/Pvv;
+        P0 = (eye(size(P0)) - K * Pvv * K') * P0;
+        delta = mz.delta(z,zm);
+        x0 = mx.step(xp,(K*delta')');
+    end
     deltas(L,:) = delta;
 end
 %%
@@ -81,7 +120,7 @@ plot(states(10:end,:))
 title('All states as matrix');
 
 %% Latency estimation
-dd = zeros(6,1);
+dd = zeros(1,6);
 for J=1:6
     figure(2+J);
     dd(J) = finddelay(lstates(:,J),lzobsval(:,J));
@@ -90,3 +129,5 @@ for J=1:6
 end
 disp('delay')
 dd
+disp('error')
+sqrt(meannonan(deltas.^2,1))'

@@ -35,9 +35,10 @@ wsigmax.sqrt = @svdsqrt;
 
 dt = 0.1;
 
+II = eye(3); 
 % dot omega = - inv(I) ( omega cross I omega)
 % I that is local
-f_fx = @(Tk,wk,vk) deal(mxt.step(Tk,[wk,vk]),wk,vk); % Xk = (Tk,wk,vk)
+f_fx = @(Tk,wk,vk) se3step_inertial_no_acc(Tk,wk,vk,II,dt); 
 h_fx = []; % @(Tk,wk,vk) deal(wk,vk);
 
 tic
