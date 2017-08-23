@@ -14,9 +14,8 @@ function [m,S] = meancovSE3manopt(X)
 %   => mu = 1/N sum (x)
 %
 % derivative for Sigma
-%   -N/2 inv(A)' - ... TBC
+%   -N/2 inv(A)' - ... 
 %   => Sigma = 1/N sum (x-mu)' (x-mu)
-%
 %
 % The maximization of (2.118) with respect to Σ is rather more involved. The simplest approach is to ignore the symmetry constraint and show that the resulting solution is symmetric as required. Alternative derivations of this result, which impose the symmetry and positive defi- niteness constraints explicitly, can be found in Magnus and Neudecker (1999). 
 % es. 2.34 Using the results (C.21), (C.26), and (C.28) from Appendix C, show that the covariance matrix Σ that maximizes the log likelihood function (2.118) is given by the sample covariance (2.122). We note that the final result is necessarily symmetric and positive definite (provided the sample covariance is nonsingular).
@@ -26,6 +25,14 @@ function [m,S] = meancovSE3manopt(X)
 %   d/dA tr(A) = I
 %   d/dx inv(F) = - inv(F) dF/dx inv(F)
 %   d/dA tr(A B A') = A (B + B')
+%
+% joint from Neucker
+%   dLikelihood = 1/2 tr(dSigma) inv(Sigma) (Z-N Sigma) inv(Sigma) + N
+%   (dmu)'inv(Sigma)(mean(X)-mu)
+%
+%   where Z = cov(X,mu)  aka the numeric covariance of X with mean mu
+%
+% there is also the second for the hessian
 %
 % Manifold loglikelihood
 % cost + -N/2 log det(Sigma) - sum delta(xi,mu)' inv(Sigma) delta(xi-mu)
