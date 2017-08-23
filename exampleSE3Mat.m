@@ -56,7 +56,7 @@ usereduxspace = 0;
 
 for L=1:size(deltas,1)
     states(L,:) = x0;
-    lstates(L,:) = mx.log(x0);
+    lstates(L,:) = mx.log(x0);  % [ rodriguez(R) traslazione velocitàangolar velocitàlinear ]
     
     [xp,Pp] = manistatestep(mx,x0,P0,f_fx,Q,wsigmax);
     

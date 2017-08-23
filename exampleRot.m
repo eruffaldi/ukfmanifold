@@ -21,7 +21,7 @@ wsigmax.sqrt = @svdsqrt;
 dt = 0.1;
 
 % integrate 
-f_fx = @(qk,ok) deal(mxr.step(qk,dt*ok),ok); % f(rot,omega) -> (rot,omega)
+f_fx = @(qk,wk) deal(mxr.step(qk,dt*ok),wk); % f(rot,omega) -> (rot,omega)
 h_fx = @(qk,ok) qk;
 
 tic
