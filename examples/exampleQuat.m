@@ -2,7 +2,7 @@
 % GLOBAL rather than LOCAL
 %
 %http://it.mathworks.com/matlabcentral/fileexchange/1176-quaternion-toolbox
-mysetup('quaternions');
+%mysetup('quaternions');
 % build input and output manifolds
 mx = manisetup(makeCom(makeQuat(),makeRn(3))); % quat and vel 
 mz = manisetup(makeQuat());

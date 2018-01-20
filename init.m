@@ -1,2 +1,2 @@
 mfilepath=fileparts(mfilename('fullpath'));
-addpath([mfilepath,filesep,'quaternions']);
+addpath(genpath([mfilepath,filesep,'ukfmani']));
