@@ -11,4 +11,4 @@ C = C0 - C0/(C0+C1)*C0;
 
 v = m.delta(x1,x0); % from x0 to x1
 
-X = m.step(x0,C/C1*v); % idem but weighted
+X = m.step(x0,C/C1*v(:)); % idem but weighted
