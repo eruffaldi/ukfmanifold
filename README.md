@@ -1,23 +1,24 @@
 
-# UKF over General Manifolds
+# Unscented Transform and Kalman Filtering (UKF) over Manifolds
 
-We express first the UKF over a Manifold (Lie Group, SO3, SE3 or their combination or other) extending the existing works on the topic
-(e.g. the original Quaternion UKF). 
+This Matlab toolbox aims at supporting non-linear transformations of Multivariate Normal (MVN) variables and bayesian filtering of such variable. The toolbox relies on the concept of Unscented Transformation that is at the basis of the Unscented Kalman Filtering. For a visual comparison between Extended Kalman Filtring and Unscented Kalman filtering look at https://github.com/eruffaldi/compare-mvn-transform
 
-In particular we acknowledge that
+Two scientific publications are related to this work, the first is Quaternion UKF [1], the other is UKF over Riemman Manifolds.
+
+# Concepts
 
 * state is in a Lie Group (or combination of there of): dimension n
 * noise is expressed in the Tangent of the Lie Group: dimension m <= n
 * we express a multivariate Gaussian as N(mu, Sigma) as usual
 
-For general:
+General manifolds requires this:
+
 * delta(Group,Group) -> tangent
 * step(Group,tangent) -> Group
-
-
 * prod(Group,Group) -> Group
 
-For Lie Group they are:
+Lie Groups require this:
+
 * prod(X,Y) = X * Y
 * inv(X) se SO3 = R',, se SE3' [R' | -R't]
 * delta(X, Y) = log(X * inv(Y))
@@ -40,10 +41,11 @@ Then we deal with the Kalman aspect in particular the correction:
 
     x_i =  step(x_est_{i-1},K delta(z,z_{obs}))
 
-# Representation
+## Representations
 
-We have these representation:
-- packed as vector
+We have these representation of the manifold data
+
+- packed as vector: each manifold is packed as a vector, not in the minimal representation (e.g. a matrix 3x3 is 9x1, matrix 4x4 is 16x1)
 - tangent as vector
 - unpacked as cell containing each element (e.g. 3x3 matrix for SO3 instead of 9 elements)
 
@@ -53,6 +55,9 @@ Example:
 - SE3: 4x4, 16, 7
 - (SE3,SE3): {4x4,4x4}, 32, 14
 
+# Usage
+
+Initialize the toolbox running init.m 
 
 # Examples of Manifold operations
 
@@ -73,18 +78,23 @@ Case of quaternion
 - logarithm/exponential: rodriguez and its inverse
 
 # TODO and Ideas
+- code generation for speed up
 - test
 - make example of two quat
 - dual quaternion manifold vs SE3 matrix
 
 # References
 
-Riemman Manifold UKF 2013: http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.646.893&rep=rep1&type=pdf
+[1] Quaternion UKF:  http://kodlab.seas.upenn.edu/uploads/Arun/UKFpaper.pdf (http://ieeexplore.ieee.org/document/1257247/)
+Kraft, E. (2003, July). A quaternion-based unscented Kalman filter for orientation tracking. In Proceedings of the Sixth International Conference of Information Fusion (Vol. 1, pp. 47-54).
+
+[2] Riemman Manifold UKF 2013: http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.646.893&rep=rep1&type=pdf
 Hauberg, Søren, François Lauze, and Kim Steenstrup Pedersen. "Unscented Kalman filtering on Riemannian manifolds." Journal of mathematical imaging and vision 46.1 (2013): 103-120.
 
-Quaternion UKF:
-* Paper: http://kodlab.seas.upenn.edu/uploads/Arun/UKFpaper.pdf (http://ieeexplore.ieee.org/document/1257247/)
-* Our Paper: https://dl.dropboxusercontent.com/u/146279/papers/2017_C_ETFADiStefano.pdf
+[3] Our variant for robotics: http://www.eruffaldi.com/papers/2017_C_ETFADiStefano.pdf
+
+Di Stefano, Erika, Emanuele Ruffaldi, and Carlo Alberto Avizzano. "A Multi-Camera Framework for Visual Servoing of a Collaborative Robot in Industrial Environments."
+
 
 Note for Scaled UKF
 * Bonus for large dimensions: http://www.cs.unc.edu/~welch/kalman/media/pdf/ACC02-IEEE1357.PDF
@@ -93,7 +103,7 @@ Note for Averaging
 * Averaging: http://www.acsu.buffalo.edu/~johnc/uf_att.pdf
 * Italian: https://re.public.polimi.it/retrieve/handle/11311/961634/40508/1_Manuscript.pdf
 
-References for Beyond this:
+References for research starting from this this:
 - Bourmaud, Guillaume, et al. "Continuous-discrete extended Kalman filter on matrix Lie groups using concentrated Gaussian distributions." Journal of Mathematical Imaging and Vision 51.1 (2015): 209-228.
 - Windle, Jesse, and Carlos M. Carvalho. "A tractable state-space model for symmetric positive-definite matrices." Bayesian Analysis 9.4 (2014): 759-792.
 - Freifeld, Oren, Soren Hauberg, and Michael J. Black. "Model transport: Towards scalable transfer learning on manifolds." Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition. 2014.
