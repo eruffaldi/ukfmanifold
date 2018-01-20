@@ -1,1 +1,2 @@
-addpath quaternions
+mfilepath=fileparts(mfilename('fullpath'));
+addpath([mfilepath,filesep,'quaternions']);
