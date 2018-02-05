@@ -14,7 +14,7 @@ steps = 20;
 N=size(Chiz,1);
 
 v = zeros(size(Chiz,1),model.alg); % preallocated
-mz = Chiz(1,:); % first is picked as mean
+mz = Chiz(1,:)'; % COL
 
 % for lie group we make a little optimization using inv
 if isfield(model,'log')
@@ -22,7 +22,7 @@ if isfield(model,'log')
     for k=1:steps
         imz = model.inv(mz);
         for i=1:N
-            v(i,:) = model.log(model.prod(Chiz(i,:),imz));
+            v(i,:) = model.log(model.prod(Chiz(i,:)',imz));
         end
         % update mz by weighted v
         mz = model.prod(model.exp(v'*sigmainfo.WM),mz);
@@ -31,7 +31,7 @@ if isfield(model,'log')
     % update v for computing covariance, skips the log
     imz = model.inv(mz);
     for i=1:N
-        v(i,:) = model.log(model.prod(Chiz(i,:),imz));
+        v(i,:) = model.log(model.prod(Chiz(i,:)',imz));
     end
 else    
     % estimate mean but weighted of WM

@@ -4,6 +4,7 @@
 function m = makeSE3Quat()
 
 m = [];
+m.type = {'SE3Quat'};
 m.inv = @se3qinv;
 m.prod = @se3qmul;
 m.log = @se3qlog;

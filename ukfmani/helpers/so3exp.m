@@ -43,6 +43,3 @@ else
     end
         assert(abs(det(R)-1) < 1e-5,'unitary');
 end
-
-y = eye(4);
-y(1:3,1:3) = R;

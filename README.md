@@ -45,9 +45,9 @@ Then we deal with the Kalman aspect in particular the correction:
 
 We have these representation of the manifold data
 
-- packed as vector: each manifold is packed as a vector, not in the minimal representation (e.g. a matrix 3x3 is 9x1, matrix 4x4 is 16x1)
-- tangent as vector
-- unpacked as cell containing each element (e.g. 3x3 matrix for SO3 instead of 9 elements)
+- packed as vector [G,1]: each manifold is packed as a vector, not in the minimal representation (e.g. a matrix 3x3 is 9x1, matrix 4x4 is 16x1)
+- tangent as vector [A,1]
+- unpacked as cell containing each element expanded [C,1] (e.g. 3x3 matrix for SO3 instead of 9 elements)
 
 Example:
 - SO3 quat: 4x1, 4, 3
@@ -77,6 +77,13 @@ Case of quaternion
 - step: integral
 - logarithm/exponential: rodriguez and its inverse
 
+# Generate Documentation
+
+- Sphinx
+- m2html
+
+ m2html('mfiles','ukfmani', 'htmldir','doc', 'recursive','on', 'global','on','todo','on');%,'source','off');
+
 # TODO and Ideas
 - code generation for speed up
 - test
@@ -103,7 +110,7 @@ Note for Averaging
 * Averaging: http://www.acsu.buffalo.edu/~johnc/uf_att.pdf
 * Italian: https://re.public.polimi.it/retrieve/handle/11311/961634/40508/1_Manuscript.pdf
 
-References for research starting from this this:
+References for research starting from this:
 - Bourmaud, Guillaume, et al. "Continuous-discrete extended Kalman filter on matrix Lie groups using concentrated Gaussian distributions." Journal of Mathematical Imaging and Vision 51.1 (2015): 209-228.
 - Windle, Jesse, and Carlos M. Carvalho. "A tractable state-space model for symmetric positive-definite matrices." Bayesian Analysis 9.4 (2014): 759-792.
 - Freifeld, Oren, Soren Hauberg, and Michael J. Black. "Model transport: Towards scalable transfer learning on manifolds." Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition. 2014.

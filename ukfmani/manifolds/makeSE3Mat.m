@@ -5,14 +5,17 @@ function m = makeSE3Mat()
 
 m1= makeRot();
 m = [];
+m.type = {'SE3Mat'};
 m.inv = @se3inv;
 m.prod = @(x,y) mflat(munflat(x)*munflat(y));
 m.m1 = makeRot();
 m.log = @se3log;
 m.exp = @se3exp;
 m.delta = @(x,y) se3log(munflat(x)*munflat(se3inv(y)));
-m.pack = @mflat;
-m.unpack = @munflat;
+m.pack = @(x) reshape(x{1},[],1);
+m.unpack = @(x) {reshape(x,4,4)};
+m.flat = @(x) reshape(x,1,[]);
+m.unflat = @(x) reshape(x,4,4);
 
 % Jacobian(y) * X
 m.step = @(X,y) mflat(munflat(m.exp(y))*munflat(X));
@@ -120,7 +123,7 @@ y = mflat(y);
 
 function u = mflat(x)
 
-u = x(:)';
+u = x(:);
 
 function u = munflat(x)
 

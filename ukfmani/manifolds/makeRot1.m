@@ -1,10 +1,11 @@
 % SO3 as matrix
 %
 % Emanuele Ruffaldi 2017 @ SSSA
-function m = makeRot()
+function m = makeRot1(axis)
 
 
 m = [];
+m.type = {'Rot1',axis};
 m.inv = @(X) flatten(unflatten(X)');
 m.prod = @(X,Y) flatten(unflatten(X)*unflatten(Y));
 m.log = @(X) so3log(unflatten(X));
@@ -14,7 +15,7 @@ m.step = @(X,y) flatten(so3exp(y)*unflatten(X));
 m.meancov = @manimeancov;
 m.count = 1;
 m.group = 9; % as matrix
-m.alg = 3;
+m.alg = 1;
 m.pack = @(x) x(:)';
 m.unpack = @(x) reshape(x,3,3);
 

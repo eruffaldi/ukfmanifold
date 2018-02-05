@@ -6,6 +6,9 @@
 % Emanuele Ruffaldi 2017 @ SSSA
 function m = manisetup(m)
 
+if iscell(m)
+    m = maniproduct(m{:});
+end
 s = dosetup(1,1,m);
 
 m.s = s;

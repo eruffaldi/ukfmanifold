@@ -27,7 +27,7 @@ vChi = zeros(2*k+1,model.alg); % delta
 
 c = sigmainfo.c;
 for I=1:k
-    psi = c*C(I,:);
+    psi = c*C(I,:)'; % ROW
     vChi(I+1,:) = psi;
     vChi(I+1+k,:) = -psi;
 	Chi(I+1,:) = model.step(mu,psi);

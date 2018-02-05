@@ -5,6 +5,7 @@ function m = makeRn(n)
 
 
 m = [];
+m.type = {'Rn',n};
 m.inv = @(x) -x;
 m.prod = @(x,y) x+y;
 m.log = @(x) x;

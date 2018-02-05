@@ -5,6 +5,7 @@ function m = makeRot()
 
 
 m = [];
+m.type = {'Rot'};
 m.inv = @(X) flatten(unflatten(X)');
 m.prod = @(X,Y) flatten(unflatten(X)*unflatten(Y));
 m.log = @(X) so3log(unflatten(X));

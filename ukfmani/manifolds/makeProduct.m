@@ -33,8 +33,10 @@ elseif nargin == 2
     m.models = {m1,m2};
     m.pack = @(x) [m1.pack(x{1}), m2.pack(x{2})]; % this works with cells
     m.unpack = @(x) {m1.unpack(x(1:g)), m2.unpack(x(g+1:end))};
-
-
+    m.type = {'Product',m1.type,m2.type};
+    m.groupinc = [0,m1.group,m.group];
+    m.alginc = [0,m1.alg,m.alg];
+    
 else
     if 1==0
         warning('makeCom multiple to be completed');
@@ -47,10 +49,10 @@ else
     else
 
         m = [];
-
-        % used for speeding up the partitioning operations
         m.groupinc = [0,cumsum(cellfun(@(x) x.group,varargin))];
         m.alginc = [0,cumsum(cellfun(@(x) x.alg,varargin))];
+
+        % used for speeding up the partitioning operations
 
         m.group = sum(cellfun(@(x) x.group,varargin));
         m.alg = sum(cellfun(@(x) x.alg,varargin));
@@ -71,6 +73,11 @@ else
         m.unpack = @(x) comunpack(m,x);
     end
 
+    c = {'Product'};
+    for I=1:nargin
+        c{I+1} = varargin{I}.type;
+    end
+    m.type = c;
 end
 
 function z = comprod(m,x1,x2)
@@ -114,7 +121,7 @@ function z = comstep(m,X,y)
     for I=1:length(m.models)
         ab = m.groupinc(I)+1:m.groupinc(I+1); 
         aab = m.alginc(I)+1:m.alginc(I+1); 
-        z(ab) = m.models{I}.step(X(ab)',y(aab));
+        z(ab) = m.models{I}.step(X(ab),y(aab));
     end
     
 function z = comdelta(m,X,Y)
@@ -122,10 +129,11 @@ function z = comdelta(m,X,Y)
     z = zeros(m.group,1);
     for I=1:length(m.models)
         ab = m.groupinc(I)+1:m.groupinc(I+1); 
-        z(ab) = m.models{I}.delta(X(ab)',Y(ab));
+        aab = m.alginc(I)+1:m.alginc(I+1); 
+        z(aab) = m.models{I}.delta(X(ab),Y(ab));
     end
 
-function y = compack(m,X)
+function z = compack(m,X)
 
     z = zeros(m.group,1);
     for I=1:length(m.models)
@@ -136,7 +144,7 @@ function y = compack(m,X)
 
 function z = comunpack(m,x)
 
-    z = cell(m.models,1);
+    z = cell(m.count,1);
     for I=1:length(m.models)
         ab = m.groupinc(I)+1:m.groupinc(I+1); 
         z{I} = m.models{I}.unpack(x(ab));

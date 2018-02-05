@@ -5,6 +5,7 @@ function m = makeQuat1(axis)
 axis = axis/norm(axis);
 
 m = [];
+m.type = {'Quat1',axis};
 m.axis = axis;
 m.inv = @(X) qconj(X);
 m.prod = @(X,Y) qmult(X,Y);
