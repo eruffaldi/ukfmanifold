@@ -6,6 +6,7 @@ function mout = makeGenProduct(name,varargin)
 % Supported:
 % - Rot Rot1 SE3Mat SE3Quat Quat Quat1 Rn
 % - Product ...
+%
 if nargin == 1
     mout = varargin{1};
     return;

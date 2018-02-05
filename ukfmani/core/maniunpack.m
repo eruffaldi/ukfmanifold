@@ -6,7 +6,7 @@ function c = maniunpack(m,x)
 
 assert(isfield(m,'s'),'missing setup, use manisetup(m)');
 if length(m.s) == 1
-    c = m.unpack(x')'; % transposed 
+    c = m.unpack(x')'; % transposed because of convention 
 else
     c = cell(size(x,1),m.count);
     s = m.s;

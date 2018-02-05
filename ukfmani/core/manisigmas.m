@@ -10,6 +10,8 @@
 %  sigmapoints Chi
 %  deltsa vChi
 %
+% TODO: modify convention to generate [G,N] instead of [N,G]
+%
 % Emanuele Ruffaldi 2017 @ SSSA
 function [Chi,vChi] = manisigmas(model,mu,S,sigmainfo)
 
@@ -27,7 +29,7 @@ vChi = zeros(2*k+1,model.alg); % delta
 
 c = sigmainfo.c;
 for I=1:k
-    psi = c*C(I,:)'; % ROW
+    psi = c*C(I,:)'; % COLUMN
     vChi(I+1,:) = psi;
     vChi(I+1+k,:) = -psi;
 	Chi(I+1,:) = model.step(mu,psi);

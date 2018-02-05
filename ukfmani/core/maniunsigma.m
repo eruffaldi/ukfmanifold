@@ -2,19 +2,21 @@
 %
 % Input:
 %  model 
-%  sigma: Chiz
+%  sigma: Chiz = [N,G]
 %  sigmainfo: the weights
 %  the delta of input sigma: vChi (see manisigma)
 %
 % Emanuele Ruffaldi 2017 @ SSSA
-function [mz,Czz,Cxz] = maniunsigma(model,Chiz,sigmainfo,vChi)
+function [mz,Czz,Cxz] = maniunsigma(model,Chiz,sigmainfo,vChi,steps)
 
+if nargin < 5
+    steps = 20;
+end
 % estimates the mean in a weighted way
-steps = 20;
 N=size(Chiz,1);
 
 v = zeros(size(Chiz,1),model.alg); % preallocated
-mz = Chiz(1,:)'; % COL
+mz = Chiz(1,:)'; % COLUMN vector
 
 % for lie group we make a little optimization using inv
 if isfield(model,'log')
@@ -38,14 +40,14 @@ else
     for k=1:steps
         for i=1:N
             % same as: se3_logdelta but with igk once
-            v(i,:) = model.delta(Chiz(i,:),mz);
+            v(i,:) = model.delta(Chiz(i,:)',mz);
         end
-        mz = model.step(mz,(v'*sigmainfo.WM)'); % [A,S] [S,1]
+        mz = model.step(mz,(v'*sigmainfo.WM)); % [A,S] [S,1]
     end
     
     % update v for computing covariance
     for i=1:N
-        v(i,:) = model.delta(Chiz(i,:),mz);
+        v(i,:) = model.delta(Chiz(i,:)',mz);
     end
 end
 

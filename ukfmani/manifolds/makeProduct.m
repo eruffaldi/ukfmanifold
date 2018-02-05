@@ -1,5 +1,7 @@
 % takes a list of manifolds and builds a single manifold
 %
+% TODO: nested manifolds
+%
 % Emanuele Ruffaldi 2017 @ SSSA
 function m = makeProduct(varargin)
 

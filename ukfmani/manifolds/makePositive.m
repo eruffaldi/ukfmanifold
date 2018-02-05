@@ -24,3 +24,5 @@
 % tangent2ambient = @(X, eta) eta;
 % proj = @(X, eta) symm(eta);
 function m = makePositive(n)
+
+error('not yet implemented')

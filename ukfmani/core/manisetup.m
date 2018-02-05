@@ -1,4 +1,4 @@
-% builds structures for fast pack and unpack
+% builds structures for fast pack and unpack, also for nested manifolds
 %
 % pack/unpack group (cell NxC) <-> (matrix NxG)
 % pack/unpack alg   (cell NxC) <-> (matrix NxA)
