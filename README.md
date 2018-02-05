@@ -20,7 +20,7 @@ General manifolds requires this:
 Lie Groups require this:
 
 * prod(X,Y) = X * Y
-* inv(X) se SO3 = R',, se SE3' [R' | -R't]
+* inv(X) se SO3 = R' or SE3 = [R' | -R't]
 * delta(X, Y) = log(X * inv(Y))
 * step(X, y) = exp(y) * X
 
@@ -47,13 +47,26 @@ We have these representation of the manifold data
 
 - packed as vector [G,1]: each manifold is packed as a vector, not in the minimal representation (e.g. a matrix 3x3 is 9x1, matrix 4x4 is 16x1)
 - tangent as vector [A,1]
-- unpacked as cell containing each element expanded [C,1] (e.g. 3x3 matrix for SO3 instead of 9 elements)
+- expanded as matrix or vector (e.g. 3x3 for matrix of rotation). Products of manifolds are expressed as cell array with the contained type, eventually in nested form
+
+When considering multiple samples we use matlab convention: [G,N] and [A,N] and cell [C,N]
+
+TODO: for nested manifold decide if nested cell arrays or keep cell arrays expanded
+
 
 Example:
-- SO3 quat: 4x1, 4, 3
-- SO3 matrix: 3x3, 9, 3
-- SE3: 4x4, 16, 7
-- (SE3,SE3): {4x4,4x4}, 32, 14
+- SO3 quaternion: expanded group 4x1, packed group 4x1, algebra 3
+- SO3 matrix: expanded group 3x3, packed group 9, algebra 3
+- SE3 matrix: expanded group 4x4, packed group 16, algebra 6
+- (SE3,SE3): expanded group {4x4,4x4}, packed group 32, algebra 12
+
+
+Each Manifold is represented as a struct with:
+- group as the size of the packed group
+- alg as the size of the algrebra space
+- count as the number of contained native manifolds, corresponding to the cell size
+- function handles for each operation
+- models as sub-models if present
 
 # Usage
 
@@ -76,6 +89,14 @@ Case of quaternion
 - delta: axis angle between quaternions as vector (aka derivative)
 - step: integral
 - logarithm/exponential: rodriguez and its inverse
+
+# Code Generation
+
+The makeGenProduct(name,m1...mN) produces a Matlab code that contains the efficient composition of the provided manifolds. In this way the singl operations are executed efficiently (e.g. testmakegen for a test) 
+
+On my tests a composition of 4 manifolds give 30% speed up
+
+TODO: support nested manifolds code generation
 
 # Generate Documentation
 

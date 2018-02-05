@@ -363,9 +363,14 @@ def main():
 	output += """			end
 		end
 """
+
+	ee = set()
 	for m in solvedmodels:
 		q= m.get("extra","")
+		ee.add(q)
+	for q in ee:
 		output += q
+		output += "\n"
 	if output == "-":
 		print output
 	else:
