@@ -1,6 +1,10 @@
 % Emanuele Ruffaldi 2017 @ SSSA
 function [xp,Pp] = manistatestep(mx,x0,P0,f_fx,Q,wsigmax)
 
+    if nargin < 6
+        wsigmax = mx.wsigma;
+    end
+    
     % process: if not identity
     if isempty(f_fx) == 0
         Xs = manisigmas(mx,x0,P0,wsigmax);   % [S,Gx]
