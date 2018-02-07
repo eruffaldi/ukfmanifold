@@ -51,8 +51,8 @@ else
     end
 end
 
-Czz = v'*sigmainfo.W*v; % covariance ZZ
+Czz = v'*sigmainfo.WC*v; % covariance ZZ - NOTE THAT WE USE DIFFERENTIAL
 
 if nargin >= 4 && nargout > 2
-    Cxz = vChi'*sigmainfo.W*v; % cross XZ
+    Cxz = vChi'*sigmainfo.WC*v; % cross XZ - NOTE THAT WE USE DIFFERENTIAL
 end

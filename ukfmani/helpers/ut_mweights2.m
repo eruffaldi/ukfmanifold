@@ -28,10 +28,10 @@ c = alpha^2*(k+kappa);
 lambda = c-k; % automatic lambda
 
 WM = repmat(1/(2*(k+lambda)), 2*k+1,1); % except first
-WM(1) = lambda / (k+lambda); % first different
+WM(1) = lambda / (k+lambda); % first is different
 
 WC = WM;
-WC(1) = WC(1) + (1-alpha^2+beta); % actually never used
+WC(1) = WC(1) + (1-alpha^2+beta);  % 
 
 W0 = eye(length(WC)) - repmat(WM,1,length(WM));
 W = W0*diag(WC)*W0';
@@ -44,4 +44,5 @@ wei = [];
 wei.c = sqrt(c);
 wei.WM = WM;
 wei.W = W;
+wei.WC = diag(WC); % only considering differential, and not the mean
 wei.sqrt = @cholcov;

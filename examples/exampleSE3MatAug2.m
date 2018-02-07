@@ -15,16 +15,16 @@ mxt = makeSE3Mat(); % helper without the need of setup
 % We build these structures for supporting the Unscented transformation. We
 % need them for the manifold x in the process, and the augmented xa in the
 % observation
-mx.wsigma = ut_mweights2(mx.group,mx.alg,0.5);
-mx.wsigma.sqrt = @svdsqrt; 
 mxa.wsigma = ut_mweights2(mxa.group,mxa.alg,0.5);
 mxa.wsigma.sqrt = @svdsqrt; 
+%mxa.wsigma.WC = mxa.wsigma.W; % Use this for testing the assumption
 
 
 % initial state and noise definition
 x0 = mx.step(mx.exp([0,0,0,  0,1,0,   0,0,0,   0,0,0]'),[pi/2,0.2,0,  0,0,0,   0,0,0,   0,0,0]');
 P0 = 0.5*eye(mx.alg);
-Q = 0.01*eye(mx.alg); % process noi!se
+%Q = 0.01*eye(mx.alg); % process noi!se
+Qnonadditive = 0.01*eye(mxa.alg-mx.alg);
 R = 1e-3*eye(mz.alg); % measure noise
 Rr = R(1:3,1:3); % only rotations
 
@@ -54,7 +54,8 @@ dt = 0.1;
 % functions work expanding each primitive manifold with their type (e.g. matrix 4x4) 
 % if the output is made of multiple e manifolds use deal for returning
 % everything
-f_fx = @(Tk,wk,vk) deal(mxt.step(Tk,[wk;vk]),wk,vk); % Xk = (Tk,wk,vk)
+%f_fx = @(Tk,wk,vk,ek) deal(mxt.step(mxt.step(Tk,[wk;vk]),ek),wk,vk,ek); % Xk = (Tk,wk,vk)
+f_fx = @(Tk,wk,vk,ek) deal(mxt.step(Tk,[wk;vk]+ek),wk,vk,ek); 
 h_fx = @(Tk,wk,vk,ek) mxt.step(Tk,ek);
 hr_fx = @(Tk,wk,vk,ek) mxt.step(Tk(1:3,1:3),ek(1:3));
 tic
@@ -65,21 +66,21 @@ lstates = zeros(size(deltas,1),mx.alg);
 usereduxspace = 0;
 Rnonadditive = eye(mxa.alg-mx.alg); % generic formulation
 Rnonadditive = R;
+Q = [];
 R = zeros(size(R)); % for testing augmentation
 
 for L=1:size(deltas,1)
     states(L,:) = x0;
     lstates(L,:) = mx.log(x0);  % [ rodriguez(R) traslazione velocitàangolar velocitàlinear ]
     
-    [xp,Pp] = manistatestep(mx,x0,P0,f_fx,Q);
-    assert(size(xp,2)==1);
+    Pa = blkdiag(P0,Qnonadditive);
+    xa = [x0; zeros(mxa.alg-mx.alg,1)]; % mean is zero
+    [xpa,Ppa,XSpa,XSpa_chi] = manistatestep(mxa,xa,Pa,f_fx);  % predicted state, and sigma point and their differential
 
     
     % Build the augmented state by expanding the state with noise with
     % zero mean and provided covariance
-    Ppa = blkdiag(Pp,Rnonadditive);
-    xpa = [xp; zeros(mxa.alg-mx.alg,1)]; % mean is zero
-    [zm,Czz,Cxaz] = manievalh(mxa,mz,xpa,Ppa,h_fx);
+    [zm,Czz,Cxaz] = manievalhsigma(mxa,mz,XSpa,XSpa_chi,h_fx); % pass directly the sigma points and the differential
         
 
     Pvv = Czz + R;

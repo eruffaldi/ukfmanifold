@@ -1,14 +1,25 @@
-% TODO: explain better the fact that angular velocity of the state is
-% GLOBAL rather than LOCAL
+% We build first the manifolds explicitly stating the state manifold x (Mx)
+% and the augmented Mxa
+Mx = {makeSE3Mat(),makeRn(3),makeRn(3)};
+Mxa = [Mx,makeRn(6)];
+Mz = makeSE3Mat();
 
-% build input and output manifolds
-mx = manisetup(makeGenProduct('se3mat_e3_e3',makeSE3Mat(),makeRn(3),makeRn(3)));
-%mx = manisetup(makeProduct(makeSE3Mat(),makeRn(3),makeRn(3))); 
-
-mz = manisetup(makeSE3Mat());
+% Then we proceed to the setup of the manifold in usable way, also using
+% the code generation for speedup of the processing
+mx = manisetup(makeGenProduct('se3mat_e3_e3',Mx{:}));
+mxa = manisetup(makeGenProduct('se3mat_e3_e3_aug',Mxa{:})); % as makeProduct(....,+1)
+mz = manisetup(Mz);
 mzr = manisetup(makeRot()); % only rotation, loss of position
-
 mxt = makeSE3Mat(); % helper without the need of setup
+
+% We build these structures for supporting the Unscented transformation. We
+% need them for the manifold x in the process, and the augmented xa in the
+% observation
+mx.wsigma = ut_mweights2(mx.group,mx.alg,0.5);
+mx.wsigma.sqrt = @svdsqrt; 
+mxa.wsigma = ut_mweights2(mxa.group,mxa.alg,0.5);
+mxa.wsigma.sqrt = @svdsqrt; 
+
 
 % initial state and noise definition
 x0 = mx.step(mx.exp([0,0,0,  0,1,0,   0,0,0,   0,0,0]'),[pi/2,0.2,0,  0,0,0,   0,0,0,   0,0,0]');
@@ -34,17 +45,17 @@ for I=2:size(zobsval,2)
 end
 zobs = @(t) zobsval(:,t);
 
-wsigmax = ut_mweights2(mx.group,mx.alg,0.5);
-wsigmax.sqrt = @svdsqrt; 
 
 % observation is identity
 % process is the integral
 dt = 0.1;
 
-% functions work in the real group space
-f_fx = @(Tk,wk,vk) deal(mxt.step(Tk,[wk;vk]),wk,vk); % Xk = (Tk,wk,vk)
-h_fx = @(Tk,wk,vk) Tk;
-hr_fx = @(Tk,wk,vk) Tk(1:3,1:3);
+% functions work expanding each primitive manifold with their type (e.g. matrix 4x4) 
+% if the output is made of multiple e manifolds use deal for returning
+% everything
+f_fx = @(Tk,wk,vk) deal(mxt.step(Tk,[wk,vk]),wk,vk); % Xk = (Tk,wk,vk)
+h_fx = @(Tk,wk,vk,ek) mxt.step(Tk,ek);
+hr_fx = @(Tk,wk,vk,ek) mxt.step(Tk(1:3,1:3),ek(1:3));
 tic
 % loop
 deltas = zeros(200,mz.alg);
@@ -55,30 +66,40 @@ haspos(4:4:end) = 0;
 haspos(5:4:end) = 0;
 haspos(6:4:end) = 0;
 usereduxspace = 0;
+Rnonadditive = eye(mxa.alg-mx.alg); % generic formulation
+Rnonadditive = R;
+R = zeros(size(R)); % for testing augmentation
 
 for L=1:size(deltas,1)
     states(L,:) = x0;
     lstates(L,:) = mx.log(x0);  % [ rodriguez(R) traslazione velocitàangolar velocitàlinear ]
     
-    [xp,Pp] = manistatestep(mx,x0,P0,f_fx,Q,wsigmax);
+    [xp,Pp] = manistatestep(mx,x0,P0,f_fx,Q);
     assert(size(xp,2)==1);
-    if haspos(L) == 0 && usereduxspace        
-        [zm,Czz,Cxz] = manievalh(mx,mzr,xp,Pp,hr_fx,wsigmax);
+    if haspos(L) == 0 && usereduxspace       
+        % TODO make shorter augmentation due to the fact that we do not
+        % have a 6D space on Z
+        Ppa = blkdiag(Pp,Rnonadditive);
+        xpa = [xp; zeros(mxa.alg-mx.alg,1)]; % mean is zero
+        [zm,Czz,Cxaz] = manievalh(mxa,mzr,xpa,Ppa,hr_fx);
         assert(size(zm,2)==1);
 
         % Kalman update with observation noise (additive)    
         Pvv = Czz + Rr;
-        K = Cxz/Pvv;
+        K = Cxaz/Pvv;
         P0 = (eye(size(P0)) - K * Pvv * K') * P0;
         
         fullobs_mat = mz.unpack( zobs(L)); % from SE3 16x1 to SE3 4x4
         
         deltar = mzr.delta(mzr.pack(fullobs_mat(1:3,1:3)),zm);
-        x0 = mx.step(xp,(K*deltar')');
+        x0 = mx.step(xp,(K*deltar'));
         delta = [deltar, NaN,NaN,NaN]; % ONLY for viz
     else       
-        [zm,Czz,Cxz] = manievalh(mx,mz,xp,Pp,h_fx,wsigmax);
-        assert(size(zm,2)==1);
+        % Build the augmented state by expanding the state with noise with
+        % zero mean and provided covariance
+        Ppa = blkdiag(Pp,Rnonadditive);
+        xpa = [xp; zeros(mxa.alg-mx.alg,1)]; % mean is zero
+        [zm,Czz,Cxaz] = manievalh(mxa,mz,xpa,Ppa,h_fx);
         
         % Kalman update with observation noise (additive)    
         if haspos(L) == 0
@@ -99,10 +120,16 @@ for L=1:size(deltas,1)
         end
         assert(size(z,1) == mz.group);
         assert(size(z,2) == 1);
-        K = Cxz/Pvv;
-        P0 = (eye(size(P0)) - K * Pvv * K') * P0;
+        
+        K = Cxaz/Pvv;
+        Ppa = (eye(size(Ppa)) - K * Pvv * K') * Ppa;
         delta = mz.delta(z,zm);
-        x0 = mx.step(xp,(K*delta'));
+        xpanew = mx.step(xpa,(K*delta'));
+        % extract x0 from xpanew because we discard the augmentation
+        % extract P0 from Ppa because we discard augmentation
+        x0 = xpanew(1:mx.group);
+        P0 = Ppa(1:mx.alg,1:mx.alg);
+        
     end
     deltas(L,:) = delta;
 end
