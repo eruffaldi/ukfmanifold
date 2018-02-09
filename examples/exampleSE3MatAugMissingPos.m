@@ -87,7 +87,7 @@ for L=1:size(deltas,1)
         % Kalman update with observation noise (additive)    
         Pvv = Czz + Rr;
         K = Cxaz/Pvv;
-        P0 = (eye(size(P0)) - K * Pvv * K') * P0;
+        P0 = (Pp - K * Pvv * K');
         
         fullobs_mat = mz.unpack( zobs(L)); % from SE3 16x1 to SE3 4x4
         
@@ -122,7 +122,7 @@ for L=1:size(deltas,1)
         assert(size(z,2) == 1);
         
         K = Cxaz/Pvv;
-        Ppa = (eye(size(Ppa)) - K * Pvv * K') * Ppa;
+        Ppa = (PPa - K * Pvv * K');
         delta = mz.delta(z,zm);
         xpanew = mx.step(xpa,(K*delta'));
         % extract x0 from xpanew because we discard the augmentation

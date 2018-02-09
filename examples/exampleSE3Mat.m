@@ -60,6 +60,7 @@ for L=1:size(deltas,1)
     states(L,:) = x0;
     lstates(L,:) = mx.log(x0);  % [ rodriguez(R) traslazione velocitàangolar velocitàlinear ]
     
+    % check if x0s is available and reuse it below
     [xp,Pp] = manistatestep(mx,x0,P0,f_fx,Q,wsigmax);
     assert(size(xp,2)==1);
     if haspos(L) == 0 && usereduxspace        
@@ -69,7 +70,7 @@ for L=1:size(deltas,1)
         % Kalman update with observation noise (additive)    
         Pvv = Czz + Rr;
         K = Cxz/Pvv;
-        P0 = (eye(size(P0)) - K * Pvv * K') * P0;
+        P0 = (Pp - K * Pvv * K');
         
         fullobs_mat = mz.unpack( zobs(L)); % from SE3 16x1 to SE3 4x4
         
@@ -100,9 +101,19 @@ for L=1:size(deltas,1)
         assert(size(z,1) == mz.group);
         assert(size(z,2) == 1);
         K = Cxz/Pvv;
-        P0 = (eye(size(P0)) - K * Pvv * K') * P0;
-        delta = mz.delta(z,zm);
-        x0 = mx.step(xp,(K*delta'));
+        %P0 = (eye(size(P0)) - K * Pvv * K') * P0;
+        P0t = Pp - K*Pvv*K';
+        delta = K*mz.delta(z,zm)';        
+        
+        if 1==0
+            % in some manifolds we cannot sum directly the delta
+            % check Christoph Hertzberg Information Fusion 2013
+            % NOT IMPLEMENTED YET [x0,P0,x0s] = manirelsum(xp,delta,P0t);
+        else
+            x0 = mx.step(xp,delta);
+            P0 = P0t;
+        end
+        
     end
     deltas(L,:) = delta;
 end

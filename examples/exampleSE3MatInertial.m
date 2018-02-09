@@ -56,7 +56,7 @@ for L=1:size(deltas,1)
     % Kalman update with observation noise (additive)    
     Pvv = Czz + R;
     K = Cxz/Pvv;
-    P0 = (eye(size(P0)) - K * Pvv * K') * P0;
+    P0 = (Pp - K * Pvv * K');
     delta = mz.delta(zobs(L),zm);
     x0 = mx.step(xp,(K*delta')');
     deltas(L,:) = delta;

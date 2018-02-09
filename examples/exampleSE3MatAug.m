@@ -86,8 +86,9 @@ for L=1:size(deltas,1)
     z = zobs(L);
 
     K = Cxaz/Pvv;
-    Ppa = (eye(size(Ppa)) - K * Pvv * K') * Ppa;
+    Ppa = (Ppa - K * Pvv * K');
     delta = mz.delta(z,zm);
+    
     xpanew = mx.step(xpa,(K*delta'));
     % extract x0 from xpanew because we discard the augmentation
     % extract P0 from Ppa because we discard augmentation
