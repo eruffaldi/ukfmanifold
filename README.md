@@ -1,26 +1,28 @@
 
-# Unscented Transform and Kalman Filtering (UKF) over Manifolds
+# Unscented Kalman Filtering (UKF) over Manifolds
 
 This Matlab toolbox aims at supporting non-linear transformations of Multivariate Normal (MVN) variables and bayesian filtering of such variable. The toolbox relies on the concept of Unscented Transformation that is at the basis of the Unscented Kalman Filtering. For a visual comparison between Extended Kalman Filtring and Unscented Kalman filtering look at https://github.com/eruffaldi/compare-mvn-transform
 
-Two scientific publications are related to this work, the first is Quaternion UKF [1], the other is UKF over Riemman Manifolds.
+Look at related publications supporting the theory of this: Quaternion UKF [1], UKF over Riemman Manifolds [2] and manifolds [3].
 
 # Concepts
 
-* state is in a Lie Group (or combination of there of): dimension n
-* noise is expressed in the Tangent of the Lie Group: dimension m <= n
-* we express a multivariate Gaussian as N(mu, Sigma) as usual
+* state is in a manfold (e.g Lie Group), or combination of there of with dimension n
+* noise is expressed in the tangent space (e.g. Lie Algebra): dimension m <= n
+* we express a multivariate Gaussian as N(mu, Sigma) with mean over manifold and covariance tangent space
 
 General manifolds requires this:
 
 * delta(Group,Group) -> tangent
 * step(Group,tangent) -> Group
-* prod(Group,Group) -> Group
 
 Lie Groups require this:
 
 * prod(X,Y) = X * Y
-* inv(X) se SO3 = R' or SE3 = [R' | -R't]
+* inv(X)
+
+And Lie Groups define delta and steps as:
+
 * delta(X, Y) = log(X * inv(Y))
 * step(X, y) = exp(y) * X
 
@@ -51,8 +53,7 @@ We have these representation of the manifold data
 
 When considering multiple samples we use matlab convention: [G,N] and [A,N] and cell [C,N]
 
-TODO: for nested manifold decide if nested cell arrays or keep cell arrays expanded
-
+%TODO: for nested manifold decide if nested cell arrays or keep cell arrays expanded
 
 Example:
 - SO3 quaternion: expanded group 4x1, packed group 4x1, algebra 3
@@ -103,13 +104,7 @@ TODO: support nested manifolds code generation
 - Sphinx
 - m2html
 
- m2html('mfiles','ukfmani', 'htmldir','doc', 'recursive','on', 'global','on','todo','on');%,'source','off');
-
-# TODO and Ideas
-- code generation for speed up
-- test
-- make example of two quat
-- dual quaternion manifold vs SE3 matrix
+m2html('mfiles','ukfmani', 'htmldir','doc', 'recursive','on', 'global','on','todo','on');%,'source','off');
 
 # References
 
@@ -119,10 +114,10 @@ Kraft, E. (2003, July). A quaternion-based unscented Kalman filter for orientati
 [2] Riemman Manifold UKF 2013: http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.646.893&rep=rep1&type=pdf
 Hauberg, Søren, François Lauze, and Kim Steenstrup Pedersen. "Unscented Kalman filtering on Riemannian manifolds." Journal of mathematical imaging and vision 46.1 (2013): 103-120.
 
-[3] Our variant for robotics: http://www.eruffaldi.com/papers/2017_C_ETFADiStefano.pdf
+[3] Hertzberg, Christoph, et al. "Integrating generic sensor fusion algorithms with sound state representations through encapsulation of manifolds." Information Fusion 14.1 (2013): 57-77.
 
+[4] Our variant for robotics: http://www.eruffaldi.com/papers/2017_C_ETFADiStefano.pdf
 Di Stefano, Erika, Emanuele Ruffaldi, and Carlo Alberto Avizzano. "A Multi-Camera Framework for Visual Servoing of a Collaborative Robot in Industrial Environments."
-
 
 Note for Scaled UKF
 * Bonus for large dimensions: http://www.cs.unc.edu/~welch/kalman/media/pdf/ACC02-IEEE1357.PDF

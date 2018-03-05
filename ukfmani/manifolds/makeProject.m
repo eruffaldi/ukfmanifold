@@ -16,6 +16,8 @@ function m = makeProject(m0,R,k)
 
 n=m0.alg;
 assert(k >= n && k > 0,'new space should have correct number of dofs');
+assert(all(size(R)==n),'R should be n by n');
+%assert R not singular
 m = m0;
 m.alg = k;
 m.models = {m0};
