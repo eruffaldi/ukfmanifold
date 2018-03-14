@@ -15,11 +15,12 @@ m.delta = @(x,y) x-y;
 m.step = @(x,y) x+y;
 m.group = n;
 m.alg = n;
+m.transport = @(X,t,Y) t;
 m.count = 1;
 m.pack = @(x) x;
 m.unpack = @(x) x;
-
-
+m.islie = 1;
+m.s = int_manisetup([],[],m);
 function [m,C] = meancov(x)
 
 m = mean(x);

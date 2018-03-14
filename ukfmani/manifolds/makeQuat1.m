@@ -14,9 +14,12 @@ m.group = 4; % as unitary quaternion
 m.alg = 1;
 m.pack = @(x) x;
 m.unpack = @(x) x;
+m.transport = @(X,t,Y) t;
 m.meancov = @manimeancov; % default
 m.step = @(X,y)mstep(m,X,y);
 m.delta = @(X,Y) mdelta(m,X,Y);
+m.islie = 1;
+m.s = int_manisetup([],[],m);
 
 function q = mstep(m,X,y)
 

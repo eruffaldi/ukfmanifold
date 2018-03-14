@@ -1,29 +1,24 @@
 % SE3 in 4x4 matrix
-%
 % the algebra is: omega linear
-%
 % Emanuele Ruffaldi 2017 @ SSSA
 function m = makeSE3Mat()
 
 m1= makeRot();
 m = [];
-m.type = {'SE3MatGlobal'};
+m.type = {'SE3MatLocal'};
 m.inv = @se3inv;
 m.prod = @(x,y) mflat(munflat(x)*munflat(y));
 m.m1 = makeRot();
 m.log = @se3log;
 m.exp = @se3exp;
-
-m.delta = @(x,y) se3log(munflat(x)*munflat(se3inv(y)));
+m.delta = @(x,y) se3log(munflat(se3inv(y))*munflat(x));
 m.pack = @(x) reshape(x{1},[],1);
 m.unpack = @(x) {reshape(x,4,4)};
 m.transport = @(X,t,Y) t;
 m.flat = @(x) reshape(x,1,[]);
 m.unflat = @(x) reshape(x,4,4);
 m.islie = 1;
-
-% Jacobian(y) * X
-m.step = @(X,y) mflat(munflat(m.exp(y))*munflat(X));
+m.step = @(X,y) mflat(munflat(X)*munflat(m.exp(y)));
 m.group = 16;
 m.alg = 6;
 m.count = 1;

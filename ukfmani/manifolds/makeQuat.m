@@ -16,3 +16,6 @@ m.group = 4; % as unitary quaternion
 m.alg = 3;
 m.pack = @(x) x;
 m.unpack = @(x) x;
+m.transport = @(X,t,Y) t;
+m.islie = 1;
+m.s = int_manisetup([],[],m);

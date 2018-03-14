@@ -27,6 +27,7 @@ elseif nargin == 2
                 m1.exp(x(1:a)), ...
                 m2.exp(x(a+1:end))];
     end
+    m.islie = m1.islie & m2.islie;
     m.delta = @(x,y) [m1.delta(x(1:g),y(1:g)), m2.delta(x(g+1:end),y(g+1:end))];
     m.step =@(X,y) [m1.step(X(1:g),y(1:a)), m2.step(X(g+1:end),y(a+1:end))]; 
     m.group = m1.group+m2.group;
@@ -38,7 +39,13 @@ elseif nargin == 2
     m.type = {'Product',m1.type,m2.type};
     m.groupinc = [0,m1.group,m.group];
     m.alginc = [0,m1.alg,m.alg];
-    
+
+    if m.islie
+        m.transport = @(X,t,Y) t;
+    else
+        m.transport = @(X,t,Y) mtransport(m,X,t,Y);
+    end
+
 else
     if 1==0
         warning('makeCom multiple to be completed');
@@ -62,7 +69,8 @@ else
         m.models = varargin;
         m.inv = @(x) cominv(m,x);
         m.prod = @(x1,x2) comprod(m,x1,x2);
-
+        m.islie = all(cellfun(@(x) x.islie,varargin));
+        
         if all(cellfun(@(x) isfield(x,'log'),varargin))
             m.log = @(x) comlog(m,x);
             m.exp = @(x) comexp(m,x);
@@ -73,6 +81,11 @@ else
         m.step =  @(X,y) comstep(m,X,y);
         m.pack = @(x) compack(m,x);
         m.unpack = @(x) comunpack(m,x);
+        if m.islie
+            m.transport = @(X,t,Y) t;
+        else
+            m.transport = @(X,t,Y) mtransport(m,X,t,Y);
+        end
     end
 
     c = {'Product'};
@@ -81,6 +94,19 @@ else
     end
     m.type = c;
 end
+m.s = int_manisetup([],[],m);
+
+
+function ty = mtransport(m,X,tx,Y)
+    ty = zeros(m.alg,1);
+    for I=1:length(m.models)
+        ab = m.groupinc(I)+1:m.groupinc(I+1);
+        aab = m.alginc(I)+1:m.alginc(I+1);
+        XI = X(ab);
+        YI = Y(ab);        
+        ty(aab) = m.models{I}.transport(XI,tx(aab),YI);
+    end
+
 
 function z = comprod(m,x1,x2)
     z = zeros(m.group,1);

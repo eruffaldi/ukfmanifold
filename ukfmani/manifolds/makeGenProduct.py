@@ -1,4 +1,7 @@
-# output log
+# TODO
+# Support Projection
+# Support SPD
+# Support transport
 import json
 import sys
 
@@ -266,7 +269,7 @@ def main():
 			m.count = {count};
 			m.pack = @mpack;
 			m.unpack = @munpack;
-
+            m.s = int_manisetup([],[],m);
 		end
 		""".format(group=group,maybeexp=maybeexp,alg=alg,count=jq["count"])
 

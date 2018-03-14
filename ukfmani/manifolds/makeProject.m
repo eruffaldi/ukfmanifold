@@ -26,7 +26,9 @@ m.alginc = [0,k];
 ostep=m0.step;
 m.step = @(X,v) ostep(X,R\zeroextend(v,n,k));
 m.delta =@(X,Y) firstk(R*m0.delta(X,Y),k);
-
+m.transport = @(X,t,Y) xtransport(X,t,Y,m0.transport,n,k);
+m.islie = m0.islie;
+m.s = int_manisetup([],[],m);
 % for Lie Group delta is: log(X*inv(Y))
 
 if isfield(m0,'log')
@@ -36,6 +38,11 @@ oexp=m0.exp;
     m.log = @(X) firstk(R*olog(X),k);
     m.exp = @(v) oexp(R\zeroextend(v,n,k));
 end
+
+function v = xtransport(X,t,Y,tra,n,k)
+
+ve = tra(X,zeroextend(t,n,k,Y),Y);
+v = ve(1:k); 
 
 function v = firstk(v0,k)
 v = v0(1:k);

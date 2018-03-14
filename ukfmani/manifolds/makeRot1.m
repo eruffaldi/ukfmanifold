@@ -16,10 +16,11 @@ m.meancov = @manimeancov;
 m.count = 1;
 m.group = 9; % as matrix
 m.alg = 1;
+m.transport = @(X,t,Y) t;
 m.pack = @(x) x(:)';
 m.unpack = @(x) reshape(x,3,3);
-
-
+m.islie = 1;
+m.s = int_manisetup([],[],m);
 
 function omega = so3log(R)
 

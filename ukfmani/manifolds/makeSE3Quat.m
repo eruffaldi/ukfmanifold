@@ -13,9 +13,12 @@ m.delta = @se3qdelta;
 m.step = @seqstep;
 m.pack = @(x) x;
 m.unpack = @(x) x;
+m.transport = @(X,t,Y) t;
 m.group = 7; 
 m.alg = 6;
 m.count = 1;
+m.islie = 1;
+m.s = int_manisetup([],[],m);
 
 function y = se3qdelta(x,y)
 error('not implemented');

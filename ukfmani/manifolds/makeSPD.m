@@ -26,6 +26,8 @@ m.pack = @(x) x(:)';
 m.unpack = @(x) reshape(x,n,n);
 m.vpack = @vpack;
 m.vunpack = @(v) vunpack(v,n);
+m.islie = 0;
+m.s = int_manisetup([],[],m);
 
 function Y = symm(X)
     Y = 0.5*(X+X');
