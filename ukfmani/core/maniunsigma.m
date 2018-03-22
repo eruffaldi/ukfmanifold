@@ -19,7 +19,7 @@ v = zeros(size(Chiz,1),model.alg); % preallocated
 mz = Chiz(1,:)'; % COLUMN vector
 
 % for lie group we make a little optimization using inv
-if isfield(model,'log')
+if isfield(model,'log') && isfield(model,'fastinv')
     % estimate mean but weighted of WM
     for k=1:steps
         imz = model.inv(mz);
