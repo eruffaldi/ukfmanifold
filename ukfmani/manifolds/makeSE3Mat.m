@@ -15,8 +15,8 @@ m.log = @se3log;
 m.exp = @se3exp;
 
 m.delta = @(x,y) se3log(munflat(x)*munflat(se3inv(y)));
-m.pack = @(x) reshape(x{1},[],1);
-m.unpack = @(x) {reshape(x,4,4)};
+m.pack = @(x) reshape(x,[],1);
+m.unpack = @(x) reshape(x,4,4);
 m.transport = @(X,t,Y) t;
 m.flat = @(x) reshape(x,1,[]);
 m.unflat = @(x) reshape(x,4,4);
@@ -129,7 +129,7 @@ y = mflat(y);
 
 function u = mflat(x)
 
-u = x(:);
+u = x(:)';
 
 function u = munflat(x)
 

@@ -15,38 +15,63 @@
 function m = makeProject(m0,R,k)
 
 n=m0.alg;
-assert(k >= n && k > 0,'new space should have correct number of dofs');
+assert(k <= n && k > 0,'new space should have correct number of dofs');
 assert(all(size(R)==n),'R should be n by n');
 %assert R not singular
 m = m0;
 m.alg = k;
-m.models = {m0};
+m.refmodels = {m0};
 m.type = {'Project',m0.type,R};
 m.alginc = [0,k];
 ostep=m0.step;
-m.step = @(X,v) ostep(X,R\zeroextend(v,n,k));
-m.delta =@(X,Y) firstk(R*m0.delta(X,Y),k);
+m.step = @(X,v) ostep(X,(R\zeroextendcol(v,n,k))');
+m.delta =@(X,Y) firstk(R*m0.delta(X,Y)',k)';
 m.transport = @(X,t,Y) xtransport(X,t,Y,m0.transport,n,k);
 m.islie = m0.islie;
+m.unpack = @(x) projectunpack(m0,x);
+m.pack = @(x) m0.pack(x);
+m.projectcov = @(C) projectcov(C,R,k);
+m.unprojectcov = @(C) unprojectcov(C,R,k,n);
 m.s = int_manisetup([],[],m);
+    
 % for Lie Group delta is: log(X*inv(Y))
 
 if isfield(m0,'log')
     olog=m0.log;
-oexp=m0.exp;
-
-    m.log = @(X) firstk(R*olog(X),k);
-    m.exp = @(v) oexp(R\zeroextend(v,n,k));
+    oexp=m0.exp;
+    m.log = @(X) firstk((R*reshape(olog(X),[],1)),k)';
+    m.exp = @(v) oexp((R\zeroextendrow(v,n,k))');
 end
 
 function v = xtransport(X,t,Y,tra,n,k)
 
-ve = tra(X,zeroextend(t,n,k,Y),Y);
+ve = tra(X,zeroextendcol(t,n,k,Y),Y);
 v = ve(1:k); 
 
+function r = projectunpack(m0,x)
+r = m0.unpack(x);
+if iscell(r)
+    r = r{1};
+end
 function v = firstk(v0,k)
 v = v0(1:k);
 
-function v = zeroextend(v0,n,k)
+% extend as row
+function v = zeroextendrow(v0,n,k)
+v=zeros(1,n);
+v(1:k) = v0;
+
+% extend as col
+function v = zeroextendcol(v0,n,k)
 v=zeros(n,1);
 v(1:k) = v0;
+
+function CR = projectcov(C,R,k)
+
+tmp = R*C;
+CR = tmp(1:k,1:k);
+
+function C = unprojectcov(CR,R,k,n)
+
+CR = zeros(n);
+CR(1:k,1:k) = R\CR;

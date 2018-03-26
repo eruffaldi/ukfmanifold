@@ -224,7 +224,7 @@ def solvemodel(m):
 		return dict(product="qmult({x1},{x2})",delta="qmdelta({x1},{x2})",step="qmstep({x1},{x2})",inv="qconj({x})",pack="{x}",unpack="{x}")
 	elif m["type"][0] == "Rot":
 		return dict(extra=rotextra,product="reshape(reshape({x1},3,3)*reshape({x2},3,3),1,[])",delta="so3log(reshape({x1},3,3)*reshape({x2},3,3)')",step="reshape(so3exp({x2})*reshape({x1},3,3),1,[])",inv="reshape(reshap({x},3,3)',1,[])",exp="reshape(so3exp({x}),1,[])",log="so3log(reshape({x},3,3))",pack="reshape({x},1,[])",unpack="reshape({x},3,3)")
-	elif m["type"][0] == "SE3Mat":
+	elif m["type"][0] == "SE3Mat" or m["type"][0] == "SE3MatGlobal":
 		return dict(extra=se3matextra,product="reshape(reshape({x1},4,4)*reshape({x2},4,4),1,[])",delta="se3mat_log(reshape({x1},4,4)*reshape(se3mat_inv({x2}),4,4))",step="reshape(reshape(se3mat_exp({x2}),4,4)*reshape({x1},4,4),1,[])",inv="se3mat_inv({x})",log="se3mat_log({x})",exp="se3mat_exp({x})",pack="reshape({x},1,[])",unpack="reshape({x},4,4)")
 	#elif m["type"][0] == "SE3Quat":
 	#	return dict(extra=se3quatextra,product="se3quat_prod({x1},{x2})",delta="se3log(se3mat_munflat({x1})*se3mat_munflat(se3inv({x2})))",step="se3mat_mflat(se3mat_munflat(m.exp({x2}))*se3mat_munflat({x1}))",inv="se3mat_inv({x})",log="se3mat_log({x})",exp="se3mat_exp({x})",pack="se3mat_mflat({x1})",unpack="se3mat_munflat({x1})")
@@ -232,8 +232,7 @@ def solvemodel(m):
 		n = m["type"][1]
 		return dict(product="{x1}+{x2}",delta="{x1}-{x2}",step="{x1}+{x2}",inv="-{x}",log="{x}",exp="{x}",pack=lambda x: x,unpack=lambda x:x)
 	else:
-		print "Unsupported",m["type"],m
-		return None
+		raise Exception("!!! Unsupported %s %s" % (m["type"],m))
 		#return dict(product="anyprod",delta="anydelta",step="anystep",inv="anyinv",log="anylog",exp="anyexp",pack=lambda x: x,unpack=lambda x:x)
 def main():
 	if len(sys.argv) != 2:

@@ -43,7 +43,15 @@ function x = removefunction(x)
 if isstruct(x)
     f = fieldnames(x);
     for I=1:length(f)
-        x.(f{I}) = removefunction(x.(f{I}));
+        v = x.(f{I});
+        if isstruct(v)
+            for J=1:length(v)
+                v(J) = removefunction(v(J));
+            end
+            x.(f{I}) = v;
+        else            
+            x.(f{I}) = removefunction(v);
+        end
     end
 elseif iscell(x)
     for I=1:numel(x)

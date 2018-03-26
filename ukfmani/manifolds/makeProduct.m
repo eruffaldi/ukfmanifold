@@ -98,7 +98,7 @@ m.s = int_manisetup([],[],m);
 
 
 function ty = mtransport(m,X,tx,Y)
-    ty = zeros(m.alg,1);
+    ty = zeros(1,m.alg);
     for I=1:length(m.models)
         ab = m.groupinc(I)+1:m.groupinc(I+1);
         aab = m.alginc(I)+1:m.alginc(I+1);
@@ -109,7 +109,7 @@ function ty = mtransport(m,X,tx,Y)
 
 
 function z = comprod(m,x1,x2)
-    z = zeros(m.group,1);
+    z = zeros(1,m.group);
     for I=1:length(m.models)
         ab = m.groupinc(I)+1:m.groupinc(I+1);
         w2 = x2(ab);
@@ -119,7 +119,7 @@ function z = comprod(m,x1,x2)
 
 function z = cominv(m,X)
 
-    z = zeros(m.group,1);
+    z = zeros(1,m.group);
     for I=1:length(m.models)
         ab = m.groupinc(I)+1:m.groupinc(I+1); 
         z(ab) = m.models{I}.inv(X(ab));
@@ -127,7 +127,7 @@ function z = cominv(m,X)
 
 function z = comlog(m,X)
 
-    z = zeros(m.alg,1);
+    z = zeros(1,m.alg);
     for I=1:length(m.models)
         ab = m.groupinc(I)+1:m.groupinc(I+1); 
         aab = m.alginc(I)+1:m.alginc(I+1); 
@@ -136,7 +136,7 @@ function z = comlog(m,X)
 
 function z = comexp(m,x)
 
-    z = zeros(m.group,1);
+    z = zeros(1,m.group);
     for I=1:length(m.models)
         ab = m.groupinc(I)+1:m.groupinc(I+1); 
         aab = m.alginc(I)+1:m.alginc(I+1); 
@@ -145,7 +145,7 @@ function z = comexp(m,x)
 
 function z = comstep(m,X,y)
 
-    z = zeros(m.group,1);
+    z = zeros(1,m.group);
     for I=1:length(m.models)
         ab = m.groupinc(I)+1:m.groupinc(I+1); 
         aab = m.alginc(I)+1:m.alginc(I+1); 
@@ -154,7 +154,7 @@ function z = comstep(m,X,y)
     
 function z = comdelta(m,X,Y)
 
-    z = zeros(m.group,1);
+    z = zeros(1,m.alg);
     for I=1:length(m.models)
         ab = m.groupinc(I)+1:m.groupinc(I+1); 
         aab = m.alginc(I)+1:m.alginc(I+1); 
@@ -163,7 +163,7 @@ function z = comdelta(m,X,Y)
 
 function z = compack(m,X)
 
-    z = zeros(m.group,1);
+    z = zeros(1,m.group);
     for I=1:length(m.models)
         ab = m.groupinc(I)+1:m.groupinc(I+1); 
         z(ab) = m.models{I}.pack(X{I});
@@ -172,10 +172,12 @@ function z = compack(m,X)
 
 function z = comunpack(m,x)
 
-    z = cell(m.count,1);
+    z = cell(size(x,1),m.count);
+    for J=1:size(x,1)
     for I=1:length(m.models)
         ab = m.groupinc(I)+1:m.groupinc(I+1); 
-        z{I} = m.models{I}.unpack(x(ab));
+        z{J,I} = m.models{I}.unpack(x(J,ab));
+    end
     end
 
 
