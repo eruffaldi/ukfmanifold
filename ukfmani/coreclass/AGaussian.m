@@ -9,8 +9,15 @@ classdef AGaussian
     methods
         function obj = AGaussian(amanifold,amean,acov)
             obj.model = amanifold;
-            obj.amean = amean;
-            obj.acov = acov;
+            if nargin == 1
+                obj.amean = zeros(1,obj.model.group);
+                obj.acov = zeros(obj.model.alg);
+            else
+                assert(all(size(amean) == [1,obj.model.group]),'mismatch mean group size in AGaussian');
+                assert(all(size(acov) == [obj.model.alg,obj.model.alg]),'mismatch cov alg size in AGaussian');
+                obj.amean = amean;
+                obj.acov = acov;
+            end
         end
         
         function n = length(obj)
@@ -28,6 +35,9 @@ classdef AGaussian
         % compute sigma points for each Gaussian 
         % Gaussian => [q,G] Sigma points
         function [Chi,vChi] = sigmas(obj,sigmainfo)
+            if nargin == 1
+                sigmainfo = obj.model.wsigma;
+            end
             % decompose the covariance
             model = obj.model;
             S = obj.acov;
@@ -43,24 +53,104 @@ classdef AGaussian
 
             c = sigmainfo.c;
             for I=1:k
-                psi = c*C(I,:)'; % COLUMN
+                psi = c*C(I,:); % ROW as ALL ALG
                 vChi(I+1,:) = psi;
                 vChi(I+1+k,:) = -psi;
                 Chi(I+1,:) = model.step(mu,psi);
                 Chi(I+1+k,:) = model.step(mu,-psi);
             end            
         end
+        
+        % given the sigma points asscoated to the current object compute
+        % the relative vector
+        function vChi = vchifromchi(obj,Chi)
+            model = obj.model;
+            k = size(C,1);
+            vChi = zeros(2*k+1,model.alg); % delta
+            for I=1:k
+                vChi(I+1,:) = model.delta(obj.mu,Chi(I+1,:));
+                vChi(I+1+k,:) = model.delta(obj.mu,Chi(I+1+k,:));
+            end            
 
-        % transform all the Gaussians using f and outputs new 
-        function [r,Cxy] = transform(obj,sigmainfo,f,outmodel,xsigma)
-            [Chi,vChi] = obj.sigmas(sigmainfo);
-            cXs = obj.model.unpack(Chi);
-            cZs = cell(size(cXs,1),outmodel.count);  % [S,Cz]
-            for I=1:size(cXs,1)
-                [cZs{I,:}] = f(cXs{I,:});
+        end
+        
+        % marginalize the current Gaussian using the provided target
+        % manifold and the indices that extract data from mean (group) and
+        % covariance (algebra)
+        function x = marginalize(obj,mx,indices,aindices)
+            x = AGaussian(mx,obj.amean(indices),obj.acov(aindices,aindices));
+        end
+        
+        % given a multivariate manifold gaussian (xy) that is this object
+        % 
+        % assigns the mean and covariance of the partition defined by (indices,aindices) using the Gaussian x 
+        function xy = assign(xy,x,indices,aindices)
+            xy.amean(indices) = mean(x);
+            xy.acov(aindices,aindices) = cov(x);
+        end
+        
+        % applies the Kalman correction:
+        %   obj is the predicted state
+        %   z   is the estimated observation
+        %   Cxz is the cross variance of xp and z from the h(x) computation
+        %   zvalur is the value of the observation
+        %
+        % note that if z has an additive noise R it has to be applied
+        % BEFORE this condition
+        function [xc,deltax] = condition(obj,z,Cxz,zvalue)
+            Czz = cov(z);
+            Cxx_p = cov(obj);
+            K = Cxz/Czz;
+            Cxx_c = (Cxx_p - K * Czz * K');
+            dz = z.model.delta(zvalue,mean(z));
+            deltax = (K*dz')';
+            mx_c = obj.model.step(mean(obj),deltax);
+            
+            xc = AGaussian(obj.model,mx_c,Cxx_c);
+        end
+
+        % transform all Gaussians using f and outputs new model
+        % if model is not provided we assume that is the current model
+        function [z,Cxz,Chiz] = transform(obj,f,outmodel)
+            if nargin < 3
+                outmodel = obj.model;
             end
-            [r,Cxz] = 
-            [zm,Czz,Cxz] = maniunsigma(mz,manipack(mz,cZs),wsigmax,vXs); % [Gz,Gx]            
+            sigmainfo = obj.model.wsigma;
+            [Chi,vChi] = obj.sigmas(sigmainfo); % Chi is [sigmas,packed group]
+            assert(size(Chi,1) == size(vChi,1),'same group and vchi');
+            assert(size(Chi,2) == obj.model.group,'correct model group size');
+            assert(size(vChi,2) == obj.model.alg,'correct model alg size');
+            cXs = obj.model.unpack(Chi); % [sigmas, unpacked group]
+            assert(size(cXs,1) == size(Chi,1),'same rows');
+            cZs = cell(size(cXs,1),outmodel.count);  % [unpacked z group,sigmas] cell
+            for I=1:size(cXs,1) % for every sigma point
+                [cZs{I,:}] = f(cXs{I,:}); 
+            end
+            % manipack wants [sigmas, unpacked z group]
+            Chiz = manipack(outmodel,cZs);
+            [zm,Czz,Cxz] = maniunsigma(outmodel,Chiz,sigmainfo,vChi); % [Gz,Gx]   
+            z = AGaussian(outmodel,zm,Czz);
+        end
+
+        
+        
+        % transform all Gaussians using f and outputs new model
+        % if model is not provided we assume that is the current model
+        function [z,Cxz,Chiz] = transformSigma(obj,Chix,f,outmodel)
+            if nargin < 4
+                outmodel = obj.model;
+            end
+            sigmainfo = obj.model.wsigma;
+            cXs = obj.model.unpack(Chix); % cXs is [unpacked group,sigmas] cell
+            cZs = cell(size(cXs,2),outmodel.count);  % [unpacked z group,sigmas] cell
+            for I=1:size(cXs,1) % for every sigma point
+                [cZs{I,:}] = f(cXs{I,:}); 
+            end
+            % manipack wants [sigmas, unpacked z group]
+            Chiz = manipack(outmodel,cZs');
+            vChi = obj.vchifromchi(Chix);
+            [zm,Czz,Cxz] = maniunsigma(outmodel,Chiz,sigmainfo,vChi); % [Gz,Gx]   
+            z = AGaussian(outmodel,zm,Czz);
         end
         
         function r = prod(obj,other)
