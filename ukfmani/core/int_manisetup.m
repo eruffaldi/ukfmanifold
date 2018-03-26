@@ -5,6 +5,10 @@
 %
 % Emanuele Ruffaldi 2017 @ SSSA
 function s = int_manisetup(group,alg,m)
+if isempty(group)
+    group = 1;
+    alg = 1;
+end
 if isfield(m,'models')
     s = [];
     for J=1:length(m.models)

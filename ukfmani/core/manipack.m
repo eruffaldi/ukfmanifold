@@ -8,7 +8,7 @@ if length(m.s) == 1
     assert(iscell(c));
     assert(size(c,2)==m.count);  % [N,C]
     for J=1:size(c,1)
-       y(J,:) = m.pack(c(J,:)');
+       y(J,:) = m.pack(c(J,:));
     end
     assert(size(y,2)==m.group);  % [N,G]
 else
