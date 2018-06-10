@@ -94,10 +94,10 @@ v(1:k) = v0;
 
 function CR = projectcov(C,R,k)
 
-tmp = R*C;
+tmp = R*C/R;
 CR = tmp(1:k,1:k);
 
 function C = unprojectcov(CR,R,k,n)
 
-CR = zeros(n);
-CR(1:k,1:k) = R\CR;
+C = zeros(n);
+C(1:k,1:k) = R\CR*R;

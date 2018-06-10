@@ -39,7 +39,7 @@ else
     for k=1:steps
         for i=1:N
             % same as: se3_logdelta but with igk once
-            v(i,:) = Csi{I}*model.delta(mus{i},mz); % Csi{i}?
+            v(i,:) = Csi{i}*model.delta(mus{i},mz); % Csi{i}?
         end
 %        mz = model.step(mz,mean(v,1));
         mz = model.step(mz,mean(v,1)'); % averaging the weighted directions
@@ -48,8 +48,8 @@ else
     
    % update v for computing covariance
     for i=1:N
-%        v(i,:) = Csi{I}*model.delta(mus(i,:),X);
-        v(i,:) = Csi{I}*model.delta(mus{i},X);
+%        v(i,:) = Csi{i}*model.delta(mus(i,:),X);
+        v(i,:) = Csi{i}*model.delta(mus{i},X);
     end
 
     C = v'*v; % covariance ZZ

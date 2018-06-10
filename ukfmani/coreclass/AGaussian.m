@@ -153,15 +153,31 @@ classdef AGaussian
             z = AGaussian(outmodel,zm,Czz);
         end
         
-        function r = prod(obj,other)
+        % r = y * x
+        function r = prod(y,x)
+            assert(x.model.islie && y.model.islie,'needed lie');
+            %assert(x.model == y.model,'needed same model');
+            
+            ya = y.model.adj(y.amean);
+            r = AGaussian(y.model,y.model.prod(y.amean,x.amean),ya*x.acov*ya'+y.acov);
         end
         
+        % Assuming this is a Lie Group performs the inversion of the
+        % uncertain transformation
         function r = inv(obj)
+            assert(obj.model.islie,'needed lie');           
+            gi = obj.model.inv(obj.amean);
+            gia = obj.model.adj(gi);
+            r = AGaussian(obj.model,gi,gia*obj.acov*gia');
         end
         
         % returns n samples that is [n,G]
         function r = sample(obj,n)
-            
+           p = randn(n(:));
+           r = AGaussian(obj.model);
+           for I=length(p)
+               
+           end
         end
     end
     
